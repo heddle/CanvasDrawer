@@ -21,10 +21,16 @@
     <None Remove="State\" />
     <None Remove="DataModel\" />
     <None Remove="Util\" />
+    <None Remove="Graphics\" />
+    <None Remove="Graphics\Cloning\" />
+    <None Remove="Graphics\Connection\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="State\" />
     <Folder Include="DataModel\" />
     <Folder Include="Util\" />
+    <Folder Include="Graphics\" />
+    <Folder Include="Graphics\Cloning\" />
+    <Folder Include="Graphics\Connection\" />
   </ItemGroup>
 </Project>
