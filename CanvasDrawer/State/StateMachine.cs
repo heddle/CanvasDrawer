@@ -1,7 +1,7 @@
 ﻿using System;
 using CanvasDrawer.State;
 
-namespace NetMapPrototype.State
+namespace CanvasDrawer.State
 {
     public sealed class StateMachine
     {

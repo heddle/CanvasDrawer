@@ -1,0 +1,861 @@
+﻿@using CanvasDrawer.Graphics
+@using CanvasDrawer.DataModel
+@using CanvasDrawer.Pages
+@using CanvasDrawer.Graphics.Items
+@using CanvasDrawer.Graphics.Editor
+@using CanvasDrawer.Graphics.Theme
+@inject IJSRuntime JSRuntime
+@namespace Editor
+
+<style>
+
+    div {
+        text-align: center;
+    }
+
+    .closebtn {
+        background-color: lightgray;
+        border: 1px solid black;
+        padding: 1px 1px;
+        cursor: pointer;
+        float: right;
+    }
+
+    .select-css--fsize {
+        float: left;
+        padding-left: 10px;
+        width = 100px;
+    }
+
+    .closebtn:hover {
+        background-color: gray;
+    }
+
+        .valtextarea {
+        float: left;
+        font-family: Roboto, Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        font-size: 12px;
+        height: 390px;
+        width: 260px;
+        text-align: left;
+        padding-top: 2px;
+        padding-top: 2px;
+        padding-left: 3px;
+        padding-right: 0px;
+        color: @TextAreaTextColor();
+        background: @TextAreaBackground();
+        outline: none;
+        font-weight: 400;
+        border: solid;
+        border-width: 1px;
+        border-color: @EditorBorderColor();
+    }
+
+    table {
+        font-family: Roboto, Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        font-size: 10px;
+        width: 100%;
+        background-color: @EditorBackground();
+        border: 1px solid black;
+    }
+
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 4px;
+        border: 1px solid black;
+    }
+
+
+    .value {
+        float: left;
+        font-family: Roboto, Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        font-size: 12px;
+        width: 95%;
+        height: 20px;
+        text-align: left;
+        border: 1px solid black;
+        padding-top: 2px;
+        padding-top: 2px;
+        padding-left: 3px;
+        padding-right: 0px;
+        color: black;
+        background: white;
+        outline: none;
+        font-weight: 400;
+    }
+
+        .value:disabled {
+            background: lightgray;
+        }
+
+
+    .ebutton {
+        background-color: @ButtonBackground();
+        border: none;
+        color: @ButtonForeground(); /* White text */
+        padding: 4px 4px; /* Some padding */
+        cursor: pointer; /* Pointer/hand icon */
+        align-items: center;
+        font-family: Roboto, Arial, Helvetica, sans-serif;
+        font-size: @ButtonFontSize();
+        outline: none; /* no focus blur*/
+        margin-top: 4px;
+        margin-bottom: 8px;
+        margin-left: -50px;
+        border-radius: 4px;
+        pointer-events: all;
+        position: absolute;
+        bottom: 0;
+    }
+
+        .ebutton:disabled {
+            background-color: #cccccc;
+        }
+
+
+    .ebutton:focus {
+        outline: none;
+    }
+
+        .scrollTable {
+            border-top: 1px solid @EditorDividerColor();
+            border-bottom: none;
+            border-left: none;
+            border-right: none;
+        }
+
+        .scrollTable th, .scrollTable td {
+            border: none;
+            width: auto;
+            text-align: center;
+            pointer-events: all;
+        }
+
+        .scrollTable th:last-child, .scrollTable td:last-child {
+            width: auto;
+        }
+
+    .scrollTable thead {
+        display: block;
+    }
+
+    .scrollTable tbody {
+        font-family: Roboto, Arial, Helvetica, sans-serif;
+        font-size: 12px;
+        display: block;
+        height: @GetEditorHeight();
+        overflow: auto;
+        pointer-events: all;
+    }
+
+    .hotlabel {
+        font-family: Roboto, Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        font-size: 20px;
+        width: 100%;
+        text-align: left;
+        border: none;
+        color: @KeyTextColor();
+        background: @KeyBackground();
+    }
+
+        .econtainer {
+            text-align: center;
+            position: relative;
+            width: 295px;
+            background-color: @EditorBackground();
+            border: solid;
+            border-width: 1px;
+            border-color: @EditorBorderColor();
+            padding-left: 6px;
+            margin-left: 4px;
+            padding-top: 6px;
+            margin-top: 4px;
+            pointer-events: all;
+        }
+
+    .select-css {
+        display: block;
+        font-size: 12px;
+        font-family: Roboto, Arial, Helvetica, sans-serif;
+        font-weight: 400;
+        color: #444;
+        line-height: 1.2;
+        padding: 1px;
+        width: 95%;
+        max-width: 100%;
+        box-sizing: border-box;
+        margin-top: 2px;
+        border: 1px solid #aaa;
+        box-shadow: 0 1px 0 1px rgba(0,0,0,.04);
+        border-radius: 4px;
+        -moz-appearance: none;
+        -webkit-appearance: none;
+        background-color: #fff;
+        background-repeat: no-repeat, repeat;
+        background-position: right .7em top 50%, 0 0;
+        background-size: .65em auto, 100%;
+        background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'), linear-gradient(to bottom, #ffffff 0%,#e5e5e5 100%);
+    }
+
+        .select-css::-ms-expand {
+            display: none;
+        }
+
+        .select-css:hover {
+            border-color: #888;
+        }
+
+        .select-css:focus {
+            border-color: #aaa;
+            box-shadow: 0 0 1px 3px rgba(59, 153, 252, .7);
+            box-shadow: 0 0 0 3px;
+            color: #222;
+            outline: none;
+        }
+
+        .select-css option {
+            font-weight: normal;
+        }
+
+
+    .container {
+        display: block;
+        position: relative;
+        padding-left: 0px;
+        margin-bottom: 2px;
+        cursor: pointer;
+        font-size: 12px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        color: @KeyTextColor();
+        background: @KeyBackground();
+        text-align: left;
+    }
+
+    .fscontainer {
+        display: block;
+        position: relative;
+        padding-left: 0px;
+        margin-bottom: 2px;
+        font-size: 12px;
+        color: @KeyTextColor();
+        background: @KeyBackground();
+        text-align: left;
+        width: 120px;
+        float: left;
+    }
+
+
+</style>
+
+<div class="econtainer" hidden="@IsHidden()">
+
+    <button id="close" class="closebtn" @onclick="@(e => ButtonClick(e, "close"))">
+        <img src="images/close.png" width="12" height="12">
+    </button>
+
+    <label class="hotlabel">@HotItemText</label>
+
+    <table class="scrollTable" id="editor" readonly>
+        <tbody>
+            @if (IsEditorVisible())
+            {
+                @foreach (var prop in PropertyArray)
+                {
+
+                    <tr>
+                        @if (GlobalEnabled() && @prop.IsLocked())
+                        {
+
+                            <td>
+                                <label class="container">
+                                    <img src="@GetImage(prop)" width="12" height="12" @onclick="(e) => CheckboxClick(e, prop)" />
+                                    &nbsp;Locked
+                                </label>
+                            </td>
+
+                            <select class="select-css" @onchange="(e) => LockedSelectionChanged(e)">
+                                <optgroup label="Locked">
+                                    <option value=True selected="@IsLocked(@prop)">True</option>
+                                    <option value=False selected="@IsUnlocked(@prop)">False</option>
+                                </optgroup>
+                            </select>
+                        }
+
+                        else if (GlobalEnabled() && CanEditTextFeatures() && @prop.IsFontSize())
+                        {
+                            <td>
+                                <label class="fscontainer">
+                                    <img src="@GetImage(prop)" width="12" height="12" />
+                                    &nbsp;Font Size
+                                </label>
+
+                                <select class="select-css--fsize" @onchange="(e) => FontSizeSelectionChanged(e)">
+                                    <optgroup label="Font Size">
+                                        @foreach (var fsize in GetFontSizes())
+                                        {
+                                            <option value=@fsize selected="@MatchFontSize(@fsize)">@fsize</option>
+                                        }
+                                    </optgroup>
+                                </select>
+                            </td>
+                        }
+
+
+                        else if (@prop.IsText())
+                        {
+
+                            @if (GlobalEnabled() && @prop.Editable())
+                            {
+
+                                <td>
+                                    <textarea class="valtextarea"
+                                              @oninput="(e) => TextAreaInput(e)"
+                                              @onblur="FocusLost"
+                                              @ref="mainTextArea"
+                                              @bind="@prop.Value"></textarea>
+                                </td>
+
+                            }
+                            else
+                            {
+                                <td><textarea class="valtextarea" value="@prop.Value" disabled></textarea></td>
+                            }
+                        }
+                        else
+                        {
+                            @if (@prop.ShowInEditor())
+                            {
+                                <td>
+                                    <label class="container">
+                                        <img src="@GetImage(prop)" width="12" height="12" hidden="@prop.IsNotDisplayable()" @onclick="(e) => CheckboxClick(e, prop)" />
+                                        &nbsp;@prop.DisplayName()
+                                    </label>
+                                </td>
+
+
+                                @if (@prop.Editable() && !LockBlocked(prop))
+                                {
+                                    <td><input class="value" type="text" @onblur="FocusLost" @bind="@prop.Value" disabled="@GlobalDisabled()" /></td>
+                                }
+                                else
+                                {
+                                    <td><input class="value" type="text" value="@prop.Value" disabled></td>
+                                }
+
+                            }
+                        }
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+
+    <button id="addprop"
+            class="ebutton"
+            hidden=@HideAddButton()
+            @onclick="HandleAdd" disabled>
+        &nbsp;&nbsp;&nbsp;ADD PROPERTY&nbsp;&nbsp;&nbsp;
+    </button>
+
+</div>
+
+
+@code {
+    //properties being edited.
+    [Parameter]
+    public static Property[] PropertyArray { get; set; } = { };
+
+    // the main text area element
+    public static ElementReference mainTextArea;
+
+    [Parameter]
+    public static String HotItemText { get; set; } = "No Item Selected";
+
+    static PropertyEditor _propertyEditor = null;
+
+    //the actual item being edited
+    private static Item _hotItem;
+
+    private static bool _inited = false;
+
+    static JSInteropManager _jsManager = null;
+
+    private void ButtonClick(MouseEventArgs me, string name)
+    {
+        DisplayManager.Instance.ToggleEditorDisplay();
+    }
+
+    /// <summary>
+    /// Get the appropriate image based on the displayed on map  property.
+    /// </summary>
+    /// <param name="prop"></param>
+    /// <returns>The correct image file.</returns>
+    private string GetImage(Property prop)
+    {
+        if (prop.IsNotDisplayable())
+        {
+            return "images/transparent.png";
+        }
+
+        if (prop.DisplayedOnCanvas)
+        {
+            if (ThemeManager.IsBlue)
+            {
+                if (ThemeManager.IsLight)
+                {
+                    return "images/check_box_lightMode_blue.svg";
+                }
+                else
+                {
+                    return "images/check_box_darkMode_blue.svg";
+                }
+            }
+            else
+            {
+                return "images/check_box_green.svg";
+            }
+
+        }
+        else
+        {
+            return "images/check_box_outline_blank_grey.svg";
+        }
+
+    }
+
+    private bool CanEditTextFeatures()
+    {
+        return (_hotItem != null) && _hotItem.IsText();
+    }
+
+    //hide the add button?
+    private bool HideAddButton()
+    {
+        return (GlobalDisabled() || (_hotItem == null) || _hotItem.IsText() || _hotItem.IsLocked());
+    }
+
+    //Text area being edited
+    private void TextAreaInput(ChangeEventArgs ce)
+    {
+
+        if (_hotItem != null)
+        {
+            Property prop = _hotItem.Properties.GetProperty(DefaultKeys.TEXT_KEY);
+            if (prop != null)
+            {
+                prop.Value = (string)(ce.Value.ToString().Clone());
+                DirtyManager.Instance.SetDirty("Property Changed");
+                FixTitle();
+                Update();
+            }
+        }
+
+    }
+
+    //is the map overall non-editable
+    private bool GlobalDisabled()
+    {
+        return !DisplayManager.Instance.MapIsEditable();
+    }
+
+    //is the map overall editable
+    private bool GlobalEnabled()
+    {
+        return !GlobalDisabled();
+    }
+
+    //background for text item text area widget
+    private string TextAreaBackground()
+    {
+        return ThemeManager.TextAreaBackground;
+    }
+
+    //text color for text item text area widget
+    private string TextAreaTextColor()
+    {
+        return ThemeManager.TextAreaTextColor;
+    }
+
+    //get the height of the editor
+    private String GetEditorHeight()
+    {
+        return "100%";
+    }
+
+    private String GetProperty(String key)
+    {
+        foreach (Property prop in PropertyArray)
+        {
+            if (prop.Key.Equals(key))
+            {
+                return String.Copy(prop.Value);
+            }
+        }
+        return "???";
+
+    }
+
+    private bool MatchFontSize(String fsize)
+    {
+        String tfs = fsize.Trim();
+        return tfs.Equals(GetProperty(DefaultKeys.FONTSIZE).Trim());
+    }
+
+    //get the allowed font sizes
+    private String[] GetFontSizes()
+    {
+        return Properties.FontSizes;
+    }
+
+
+    //get the locked (true or false) of the hot item
+    private String GetLocked()
+    {
+        foreach (Property prop in PropertyArray)
+        {
+            if (prop.Key.Equals(DefaultKeys.LOCKED_KEY))
+            {
+                return String.Copy(prop.Value);
+            }
+        }
+        return "???";
+    }
+
+
+
+    //is the property uneditable because it is locked
+    private bool LockBlocked(Property prop)
+    {
+
+        //the lock property is never locked
+        if (prop.IsLocked())
+        {
+            return false;
+        }
+
+        return _hotItem.IsLocked();
+
+    }
+
+    //is the prop (assumed key is LOCKED) true?
+    private bool IsLocked(Property prop)
+    {
+        return prop.Value.Contains("rue");
+    }
+
+    //is the prop (assumed key is LOCKED_KEY) friendly?
+    private bool IsUnlocked(Property prop)
+    {
+        return !IsLocked(prop);
+    }
+
+    //border around entire editor
+    String EditorBorderColor()
+    {
+        return ThemeManager.EditorBorderColor;
+    }
+
+    //line between header and editor proper
+    String EditorDividerColor()
+    {
+        return ThemeManager.EditorDividerColor;
+    }
+
+    //background color of editor
+    String EditorBackground()
+    {
+        return ThemeManager.EditorBackgroundColor;
+    }
+
+    //background color of buttons
+    String ButtonBackground()
+    {
+        return ThemeManager.DefaultButtonBackground;
+    }
+
+    //text color of buttons
+    String ButtonForeground()
+    {
+        return ThemeManager.ButtonTextColor;
+    }
+
+    //fontsize of buttons
+    String ButtonFontSize()
+    {
+        return ThemeManager.ButtonFontSize;
+    }
+
+    //fontsize of buttons
+    String ButtonFont()
+    {
+        return ThemeManager.ButtonFont;
+    }
+
+    //the text size of a text item was changed
+    private void FontSizeSelectionChanged(ChangeEventArgs args)
+    {
+        if (_hotItem != null)
+        {
+            string selection = args.Value.ToString().Trim();
+            if (selection != null)
+            {
+
+                foreach (Property prop in PropertyArray)
+                {
+                    if (prop.Key.Equals(DefaultKeys.FONTSIZE))
+                    {
+                        prop.Value = String.Copy(selection);
+                        DirtyManager.Instance.SetDirty("Changed Font Size");
+                        Update();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+
+    //the locked (true or false) selection was changed
+    private void LockedSelectionChanged(ChangeEventArgs args)
+    {
+        if (_hotItem != null)
+        {
+            string selection = args.Value.ToString();
+            if (selection != null)
+            {
+
+                foreach (Property prop in PropertyArray)
+                {
+                    if (prop.Key.Equals(DefaultKeys.LOCKED_KEY))
+                    {
+                        prop.Value = selection.Contains("alse") ? "False" : "True";
+
+                        if (_hotItem.IsLocked() && _hotItem.Selected)
+                        {
+                            _hotItem.Selected = false;
+                        }
+                        DirtyManager.Instance.SetDirty("Changed Locked State");
+                        Update();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private void Update()
+    {
+        GraphicsManager.Instance.ForceDraw();
+    }
+
+    //get the background color for the keys from the ThemeManager
+    public String KeyBackground()
+    {
+        return ThemeManager.EditorKeyBackground;
+    }
+
+    //get the text color for the keys from the ThemeManager
+    public String KeyTextColor()
+    {
+        return ThemeManager.EditorKeyTextColor;
+    }
+
+    //focus of value field was lost
+    public void FocusLost(FocusEventArgs e)
+    {
+        DirtyManager.Instance.SetDirty("Property Changed");
+        FixTitle();
+        Update();
+    }
+
+
+    //check box changed state
+    void CheckboxClick(MouseEventArgs ce, Property prop)
+    {
+
+        if (LockBlocked(prop))
+        {
+            return;
+        }
+        prop.ToggleDisplayedOnCanvas();
+        Update();
+    }
+
+
+    //user hit the add property button
+    void HandleAdd(MouseEventArgs e)
+    {
+        string newkey = _jsManager.Prompt("New property key", "Enter new key here");
+        if (newkey != null)
+        {
+            newkey = newkey.Trim();
+            if (newkey.Length > 0)
+            {
+                //check for duplicates
+                foreach (Property prop in PropertyArray)
+                {
+                    if (newkey.Equals(prop.Key))
+                    {
+                        string message = "The key \"" + newkey + "\" already exists.";
+                        _jsManager.Alert(message);
+                        return;
+                    }
+                } //foreach
+
+                if (_hotItem != null)
+                {
+                    Property prop = new Property(newkey, "???", Property.NOTDISPLAYEDONCANVAS);
+                    _hotItem.Properties.Add(prop);
+                    _hotItem.Properties.SortProperties();
+                    PropertyArray = _hotItem.Properties.Clone();
+                    Refresh();
+                }
+            }
+        }
+    }
+
+
+    //initialization
+    private Task InitOnce()
+    {
+
+        if (!_inited)
+        {
+            _jsManager = new JSInteropManager(JSRuntime, false);
+            _propertyEditor = PropertyEditor.Instance;
+            _propertyEditor.SetHotItem = SetHotItem;
+            _propertyEditor.Refresher = Refresh;
+            _inited = true;
+        }
+        return Task.FromResult("done");
+    }
+
+    //this refers to the property, not the buttons
+    public string IsDisabled(Property prop)
+    {
+        if (prop.Editable())
+        {
+            return "";
+        }
+        return "disabled";
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        if (firstRender)
+        {
+            _inited = false;
+            await InitOnce();
+        }
+        await InitOnce();
+    }
+
+    //acts on buttons
+    private void Enable(string eid, bool enabled)
+    {
+        _jsManager.Enable(eid, enabled);
+    }
+
+    //is the editor visible
+    bool IsEditorVisible()
+    {
+
+        if (DisplayManager.Instance.IsPropertyEditorVisible())
+        {
+            if (GlobalEnabled())
+            {
+                return true;
+            }
+            else
+            {
+                //in view only mode don't leave up if no item displyed
+                return (_hotItem != null);
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    //Should the component be hidded because the GUI
+    //is not editable
+    bool IsHidden()
+    {
+        return !IsEditorVisible();
+    }
+
+    //force a redraw of the editor
+    public void Refresh()
+    {
+        StateHasChanged(); //forces an update
+    }
+
+    private void FixTitle()
+    {
+        if (_hotItem == null)
+        {
+            HotItemText = "No Item Selected";
+        }
+        else
+        {
+
+            if (_hotItem.IsText())
+            {
+                HotItemText = "Text Item";
+            }
+            else
+            {
+                String icon = _hotItem.Properties.GetIcon();
+                if ((icon == null) || (icon.Length < 3))
+                {
+                    HotItemText = _hotItem.Properties.GetName();
+                }
+                else
+                {
+                    HotItemText = icon + ": " + _hotItem.Properties.GetName();
+                }
+            }
+
+        }
+    }
+
+    //received a new hot item from editor manager
+    public void SetHotItem(Item item)
+    {
+
+        //mark old one as not being edited
+        if (_hotItem != null)
+        {
+            _hotItem.Editing = false;
+        }
+        _hotItem = item;
+
+        if (_hotItem == null)
+        {
+            PropertyArray = new Property[0];
+            Enable("addprop", false);
+        }
+        else
+        {
+            PropertyArray = _hotItem.Properties.Clone();
+            _hotItem.Editing = true;
+            Enable("addprop", !_hotItem.IsText() && !_hotItem.IsLocked());
+        }
+
+        FixTitle();
+
+        Refresh(); //forces an update
+    }
+
+}

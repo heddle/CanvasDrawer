@@ -1,0 +1,108 @@
+﻿@using CanvasDrawer.Graphics.Theme
+@using CanvasDrawer.Graphics.Feedback
+@using CanvasDrawer.Graphics.Keyboard
+@using CanvasDrawer.Pages
+@using CanvasDrawer.Graphics
+@inject IJSRuntime JSRuntime
+@namespace Feedback
+
+<style>
+    textarea {
+        background-color: @FeedbackBackground();
+        color: @FeedbackTextColor();
+        width: 190px;
+        height: 480px;
+        border: none;
+        font-weight: bold;
+        opacity: 0.9;
+    }
+</style>
+
+<textarea tabindex="3"
+          hidden="@FeedbackHidden()"
+          id="feedback" readonly
+          @ref="feedbackElement">
+@FeedbackText
+</textarea>
+
+@code {
+    //the feedback text
+    [Parameter]
+    public static string FeedbackText { get; set; } = "";
+
+    static JSInteropManager _jsManager = null;
+
+    // the feedback html element
+    public static ElementReference feedbackElement;
+
+    private static bool _inited = false;
+
+    //get the feedback area background color from the ThemeManager
+    public String FeedbackBackground()
+    {
+        return ThemeManager.FeedbackBackground;
+    }
+
+    //get the feedback area text color from the ThemeManager
+    public String FeedbackTextColor()
+    {
+        return ThemeManager.FeedbackTextColor;
+    }
+
+    //generic border color from theme manager
+    public String GenericBorder()
+    {
+        return ThemeManager.GenericBorder;
+    }
+
+    //initialization
+    private Task InitOnce()
+    {
+
+        if (!_inited)
+        {
+            _jsManager = new JSInteropManager(JSRuntime, false);
+            FeedbackManager.Instance.FeedbackUpdater = SetFeedbackText;
+            FeedbackManager.Instance.Refresher = Refresh;
+            _inited = true;
+        }
+        return Task.FromResult("done");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        if (firstRender)
+        {
+            _inited = false;
+            await InitOnce();
+        }
+        await InitOnce();
+    }
+
+    //set the
+    public void SetFeedbackText(List<string> fbstrings)
+    {
+
+        string s = "";
+
+        foreach (string fbs in fbstrings)
+        {
+            s += fbs;
+            s += "\n";
+        }
+        FeedbackText = s;
+        Refresh();
+    }
+
+    bool FeedbackHidden()
+    {
+        return !DisplayManager.Instance.IsFeedbackVisible();
+    }
+
+    //force a redraw
+    public void Refresh()
+    {
+        StateHasChanged(); //forces an update
+    }
+}

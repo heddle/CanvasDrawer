@@ -1,0 +1,168 @@
+﻿@using CanvasDrawer.Graphics
+@using CanvasDrawer.Graphics.Popup
+@using CanvasDrawer.Pages
+@using CanvasDrawer.Graphics.Theme
+@inject IJSRuntime JSRuntime
+@namespace ShapeChooser
+<style>
+
+        .souterdiv {
+            position: absolute;
+            left: @ChooserLeft();
+            top: @ChooserTop();
+            width: inherit;
+            height: inherit;
+            border: none;
+        }
+
+        .sbtn-group {
+            pointer-events: none;
+        }
+
+        .sbtn-group button {
+            background-color: @BackgroundColor();
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            float: left;
+            margin: 0;
+            width: 28px;
+            height: 28px;
+            outline: none;
+            pointer-events:all;
+        }
+
+
+        /* Add a background color on hover */
+        .sbtn-group button:hover {
+            background-color: @HoverColor();
+        }
+
+        .sbtn-group button:focus {
+            outline: none;
+        }
+
+            .sbtn-group img {
+                width: 24px;
+                height: 24px;
+            }
+
+            .sbtn-group:after {
+                content: "";
+                clear: both;
+                display: table;
+            }
+</style>
+
+<div class="souterdiv" hidden=@ShapeMenuHidden()>
+    <div class="sbtn-group">
+        @foreach (var ifile in ImageFiles())
+        {
+            <button id="@ifile"
+                    @onclick="@(e => ButtonClick(e, @ifile))"
+                    @onmouseover="@(e => MouseOver(e, @ifile))"
+                    @onmouseout="@(e => MouseOut(e, @ifile))">
+                <img src=@ifile>
+            </button>
+        }
+    </div>
+</div>
+
+@code {
+
+    private String[] ImageFiles()
+    {
+
+        if (SubnetShapeMenu.Instance == null)
+        {
+            return null;
+        }
+
+        return SubnetShapeMenu.Instance.ImageFiles;
+    }
+
+
+    //one of the buttons was hit
+    public void ButtonClick(MouseEventArgs me, string name)
+    {
+        SubnetShapeMenu.Instance.MenuSelection(name);
+    }
+
+    //one of the buttons was entered
+    public void MouseOver(MouseEventArgs me, string name)
+    {
+    }
+
+    //one of the buttons was exited
+    public void MouseOut(MouseEventArgs me, string name)
+    {
+    }
+
+    //X location of shape menu popup
+    private String ChooserLeft()
+    {
+        return SubnetShapeMenu.Instance.PopupX;
+    }
+
+    //Y location of shape menu popup
+    private String ChooserTop()
+    {
+        return SubnetShapeMenu.Instance.PopupY;
+    }
+
+    //is the shape popup up or down?
+    private bool ShapeMenuHidden()
+    {
+        return !SubnetShapeMenu.Instance.PopupVisible;
+    }
+
+    //background color of popup
+    public String BackgroundColor()
+    {
+        return ThemeManager.ToolMenuBackgroundColor;
+    }
+
+    //hover color of popup
+    public String HoverColor()
+    {
+        return ThemeManager.ToolMenuHoverColor;
+    }
+
+
+    //for calling javascript
+    private static JSInteropManager _jsManager = null;
+
+    //watch for initialization
+    private static bool _inited = false;
+
+    //initialization
+    private Task InitOnce()
+    {
+
+        if (!_inited)
+        {
+            _jsManager = new JSInteropManager(JSRuntime, false);
+            _inited = true;
+            SubnetShapeMenu.Instance.Refresher = Refresh;
+            Refresh();
+        }
+        return Task.FromResult("done");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        if (firstRender)
+        {
+            _inited = false;
+            await InitOnce();
+        }
+        await InitOnce();
+    }
+
+    //force a redraw
+    public void Refresh()
+    {
+        StateHasChanged(); //forces an update
+    }
+}

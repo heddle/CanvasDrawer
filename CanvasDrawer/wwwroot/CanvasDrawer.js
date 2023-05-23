@@ -1,4 +1,4 @@
-﻿window.addEventListener('resize', () => Tools.windowResize());
+window.addEventListener('resize', () => Tools.windowResize());
 window.addEventListener('scroll', () => Tools.windowScroll());
 
 //for rubberbanding
@@ -9,7 +9,7 @@ window.Tools = {
 
     //in resonse to window resize clear and call csharp
     windowResize: function () {
-        canvasDrawerJs.clear();
+        canvasDrawer.clear();
         //call the csharp method
         DotNet.invokeMethodAsync('CanvasDrawer', 'WindowResized')
             .then(message => {
@@ -25,7 +25,7 @@ window.Tools = {
     },
 }
 
-window.canvasDrawerJs = {
+window.canvasDrawer = {
 
     //the window's inner height
     frameHeight: function () {

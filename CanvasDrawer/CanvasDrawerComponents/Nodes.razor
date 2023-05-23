@@ -1,0 +1,298 @@
+﻿@using CanvasDrawer.Graphics
+@using CanvasDrawer.Pages
+@using CanvasDrawer.Graphics.Toolbar
+@using CanvasDrawer.Graphics.Keyboard
+@using CanvasDrawer.Graphics.Theme
+@inject IJSRuntime JSRuntime
+@namespace Nodes
+<style>
+
+    .noutdiv {
+        outline: none;
+    }
+
+    .icon-group {
+        margin: 0;
+        padding: 0;
+        outline: none; /* no focus blur*/
+    }
+
+        .icon-group button {
+            border: 1px solid @DefaultBorderColor(); /* border */
+            padding: 1px; /* Some padding */
+            cursor: pointer; /* Pointer/hand icon */
+            float: left; /* Float the buttons side by side */
+            margin-bottom: 5px;
+            margin-top: 2px;
+            margin-right: 0px;
+            width: 36px;
+            height: 36px;
+            outline: none;
+        }
+
+            .icon-group button:first-of-type {
+                border-bottom-left-radius: 4px;
+                border-top-left-radius: 4px;
+            }
+
+            .icon-group button:nth-last-of-type(2) {
+                border-bottom-right-radius: 4px;
+                border-top-right-radius: 4px;
+            }
+
+            .icon-group button:last-of-type {
+                border-bottom-left-radius: 4px;
+                border-top-left-radius: 4px;
+                border-bottom-right-radius: 4px;
+                border-top-right-radius: 4px;
+            }
+
+
+
+
+        .icon-group img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .icon-group:after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+</style>
+
+<div class="noutdiv" tabindex="2" @onkeydown="KeyDown">
+
+    <div class="icon-group" hidden="@IsHidden()">
+
+        <button id="webservice"
+                title="place a webservice"
+                @onclick="@(e => ButtonClick(e, "webservice"))"
+                @onmouseover="@(e => MouseOver(e, "webservice"))"
+                @onmouseout="@(e => MouseOut(e, "webservice"))">
+            <img src="images/web.svg">
+        </button>
+
+        <button id="router"
+                title="place a router"
+                @onclick="@(e => ButtonClick(e, "router"))"
+                @onmouseover="@(e => MouseOver(e, "router"))"
+                @onmouseout="@(e => MouseOut(e, "router"))">
+            <img src="images/router.svg">
+        </button>
+
+        <button id="wireless"
+                title="place a wireless access point"
+                @onclick="@(e => ButtonClick(e, "wireless"))"
+                @onmouseover="@(e => MouseOver(e, "wireless"))"
+                @onmouseout="@(e => MouseOut(e, "wireless"))">
+            <img src="images/wireless.svg">
+        </button>
+
+        <button id="plc"
+                title="place a programmable logic controller"
+                @onclick="@(e => ButtonClick(e, "plc"))"
+                @onmouseover="@(e => MouseOver(e, "plc"))"
+                @onmouseout="@(e => MouseOut(e, "plc"))">
+            <img src="images/logic.svg">
+        </button>
+
+        <button id="workstation"
+                title="place a workstation node"
+                @onclick="@(e => ButtonClick(e, "workstation"))"
+                @onmouseover="@(e => MouseOver(e, "workstation"))"
+                @onmouseout="@(e => MouseOut(e, "workstation"))">
+            <img src="images/workstation.svg">
+        </button>
+
+        <button id="switch"
+                title="place a switch"
+                @onclick="@(e => ButtonClick(e, "switch"))"
+                @onmouseover="@(e => MouseOver(e, "switch"))"
+                @onmouseout="@(e => MouseOut(e, "switch"))">
+            <img src="images/switch.svg">
+        </button>
+
+        <button id="server"
+                title="place a server"
+                @onclick="@(e => ButtonClick(e, "server"))"
+                @onmouseover="@(e => MouseOver(e, "server"))"
+                @onmouseout="@(e => MouseOut(e, "server"))">
+            <img src="images/server.svg">
+        </button>
+
+        <button id="laptop"
+                title="place a laptop"
+                @onclick="@(e => ButtonClick(e, "laptop"))"
+                @onmouseover="@(e => MouseOver(e, "laptop"))"
+                @onmouseout="@(e => MouseOut(e, "laptop"))">
+            <img src="images/laptop.svg">
+        </button>
+
+        <button id="cloud"
+                title="place a (internet) cloud"
+                @onclick="@(e => ButtonClick(e, "cloud"))"
+                @onmouseover="@(e => MouseOver(e, "cloud"))"
+                @onmouseout="@(e => MouseOut(e, "cloud"))">
+            <img src="images/cloud.svg">
+        </button>
+
+        <button id="printer"
+                title="place a printer "
+                @onclick="@(e => ButtonClick(e, "printer"))"
+                @onmouseover="@(e => MouseOver(e, "printer"))"
+                @onmouseout="@(e => MouseOut(e, "printer"))">
+            <img src="images/printer.svg">
+        </button>
+
+        <button id="firewall"
+                title="place a firewall"
+                @onclick="@(e => ButtonClick(e, "firewall"))"
+                @onmouseover="@(e => MouseOver(e, "firewall"))"
+                @onmouseout="@(e => MouseOut(e, "firewall"))">
+            <img src="images/firewall.svg">
+        </button>
+
+        <button id="mirror"
+                title="place a mirror"
+                @onclick="@(e => ButtonClick(e, "mirror"))"
+                @onmouseover="@(e => MouseOver(e, "mirror"))"
+                @onmouseout="@(e => MouseOut(e, "mirror"))">
+            <img src="images/mirror.svg">
+        </button>
+
+    </div>
+
+</div>
+
+
+@code {
+
+    //for calling javascript
+    private static JSInteropManager _jsManager = null;
+
+    //watch for initialization
+    private static bool _inited = false;
+
+    //is the GUI editable
+    bool IsEditable() {
+        return DisplayManager.Instance.MapIsEditable();
+    }
+
+    //Should the component be hidded because the GUI
+    //is not editable
+    bool IsHidden() {
+        return !IsEditable();
+    }
+
+    //is this the light theme
+    bool IsLight() {
+        return ThemeManager.IsLight;
+    }
+
+    //is this the dark theme
+    bool IsDark() {
+        return !IsLight();
+    }
+
+    //get the label color from the theme manager
+    public String LabelColor() {
+        return ThemeManager.LabelColor;
+    }
+
+    //get the background color from the theme manager
+    public String ContainerColor() {
+        return ThemeManager.ContainerColor;
+    }
+
+
+    //A key down occured
+    void KeyDown(KeyboardEventArgs e) {
+        KeyboardManager.Instance.KeyDown(e);
+    }
+
+    //initialization
+    private Task InitOnce() {
+
+        if (!_inited) {
+            _jsManager = new JSInteropManager(JSRuntime, false);
+            _inited = true;
+            ThemeManager.JsManager = _jsManager;
+            ToolbarManager.Instance.JsManager = _jsManager;
+            ToolbarManager.Instance.SetAllBackgrounds();
+            ToolbarManager.Instance.RefresherNodes = Refresh;
+        }
+        return Task.FromResult("done");
+    }
+
+    //one of the toolbar buttons was hit
+    private void ButtonClick(MouseEventArgs me, string name) {
+        ToolbarButtonData data = ToolbarManager.Instance.GetButtonData(name);
+        if ((data != null) && data.Enabled) {
+
+            string oldSelected = ToolbarManager.Instance.SelectButton(name);
+            ToolbarManager.Instance.SetButtonBackground(data);
+            ToolbarManager.Instance.SetButtonBackground(oldSelected);
+
+            if (!data.Selected) {
+                ToolbarManager.Instance.SetButtonBackground("pointer");
+            }
+
+            ToolbarManager.Instance.HandleNodesButtonClick(data);
+        }
+    }
+
+    //one of the toolbar button was entered
+    public void MouseOver(MouseEventArgs me, string name) {
+        ToolbarButtonData data = ToolbarManager.Instance.GetButtonData(name);
+
+        if ((data != null) && data.Enabled) {
+            _jsManager.ChangeBackground(data.Id, ThemeManager.ButtonBackgrounds[ThemeManager.MOUSEON]);
+
+            if (data.Selected) {
+                _jsManager.ChangeBorder(data.Id, ThemeManager.SelectedButtonBorder);
+            }
+            else {
+                _jsManager.ChangeBorder(data.Id, ThemeManager.ButtonBackgrounds[ThemeManager.MOUSEON]);
+            }
+        }
+    }
+
+    //one of the toolbar buttons was exited
+    public void MouseOut(MouseEventArgs me, string name) {
+        ToolbarButtonData data = ToolbarManager.Instance.GetButtonData(name);
+
+        if ((data != null) && data.Enabled) {
+            ToolbarManager.Instance.SetButtonBackground(data);
+
+            if (data.Selected) {
+
+            }
+            else {
+                _jsManager.ChangeBorder(data.Id, DefaultBorderColor());
+            }
+        }
+    }
+
+    //default button border
+    private String DefaultBorderColor() {
+        return ThemeManager.DefaultButtonBorder;
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+
+        if (firstRender) {
+            _inited = false;
+            await InitOnce();
+        }
+        await InitOnce();
+    }
+
+    //force a redraw
+    public void Refresh() {
+        StateHasChanged(); //forces an update
+    }
+
+}

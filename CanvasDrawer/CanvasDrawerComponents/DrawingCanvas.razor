@@ -1,0 +1,398 @@
+﻿@using CanvasDrawer.Graphics
+@using CanvasDrawer.Graphics.Keyboard
+@using CanvasDrawer.Pages
+@using CanvasDrawer.Graphics.Theme;
+@using CanvasDrawer.Json;
+@using CanvasDrawer.Graphics.Toolbar;
+@using CanvasDrawer.Util;
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@namespace DrawingCanvas
+
+<style>
+
+        .flexscroll {
+            width: 100%;
+            height: @SBHEIGHT;
+            overflow: scroll;
+            background: @BackgroundColor();
+        }
+
+            .flexscroll::-webkit-scrollbar {
+                width: 12px;
+                height: 12px;
+                border-radius: 4px;
+            }
+
+            .flexscroll::-webkit-scrollbar-corner {
+                background: @BackgroundColor();
+            }
+
+            .flexscroll::-webkit-scrollbar:horizontal {
+                display:@DisplayHScrollbar();
+            }
+
+            .flexscroll::-webkit-scrollbar:vertical {
+                display:@DisplayVScrollbar();
+            }
+
+            /* Track */
+            .flexscroll::-webkit-scrollbar-track {
+                -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+                -webkit-border-radius: 12px;
+                border-radius: 4px;
+            }
+
+        /* Handle */
+            .flexscroll::-webkit-scrollbar-thumb {
+                -webkit-border-radius: 4px;
+                border: solid 1px;
+                border-color: @ScrollThumbBorder();
+                border-radius: 4px;
+                background: @ScrollThumbBackground();
+                -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+            }
+
+                .flexscroll::-webkit-scrollbar-thumb:hover {
+                    background: @ScrollThumbHover();
+                }
+
+
+        #maincanvas {
+            width: 2400px;
+            height: 1350px;
+            border: none;
+            background-color: @CanvasColor();
+            outline: none;
+        }
+
+</style>
+
+<img src="images/web.svg" id="img_webservice" hidden />
+<img src="images/router.svg" id="img_router" hidden />
+<img src="images/wireless.svg" id="img_wireless" hidden />
+<img src="images/logic.svg" id="img_plc" hidden />
+<img src="images/workstation.svg" id="img_workstation" hidden />
+<img src="images/switch.svg" id="img_switch" hidden />
+<img src="images/server.svg" id="img_server" hidden />
+<img src="images/laptop.svg" id="img_laptop" hidden />
+<img src="images/cloud.svg" id="img_cloud" hidden />
+<img src="images/printer.svg" id="img_printer" hidden />
+<img src="images/firewall.svg" id="img_firewall" hidden />
+<img src="images/mirror.svg" id="img_mirror" hidden />
+
+<img src="images/cloud_Net.svg" id="cloud_Net" hidden />
+<img src="images/connector_WAN64.svg" id="boltSmall" hidden />
+<img src="images/connector_WAN256.svg" id="boltLarge" hidden />
+
+<img src="images/lock_white.png" id="white_lock" hidden />
+<img src="images/lock_black.png" id="black_lock" hidden />
+
+
+<div class="flexscroll" id="canvasdiv" @onscroll="Scroll">
+    <canvas id="maincanvas" draggable="false"
+            tabindex="1"
+            @onclick="SingleClick"
+            @ondblclick="DoubleClick"
+            @onmousedown="MouseDown"
+            @onmousemove="MouseMove"
+            @onmouseout="MouseExit"
+            @onmouseover="MouseEnter"
+            @onmouseup="MouseUp"
+            @onkeydown="KeyDown"
+            @ref="mainCanvasElement">
+    </canvas>
+</div>
+
+@code {
+
+    private static bool _inited = false;
+
+    private static String SBHEIGHT
+        = "800px";
+
+    //to call javascript
+    static JSInteropManager _jsManager = null;
+    static PageManager _pageManager = null;
+
+    // the canvas html element
+    public static ElementReference mainCanvasElement;
+
+    //get the canvas background color from the theme manager
+    private String CanvasColor()
+    {
+        return ThemeManager.CanvasColor;
+    }
+
+    //color for the border of the thumb
+    private String ScrollThumbBorder()
+    {
+        return ThemeManager.ScrollThumbBorder;
+    }
+
+    //color for the background of the thumb
+    private String ScrollThumbBackground()
+    {
+        return ThemeManager.ScrollThumbBackground;
+    }
+
+    //color for the hover on the thumb
+    private String ScrollThumbHover()
+    {
+        return ThemeManager.ScrollThumbHover;
+    }
+
+    //get the background color from the theme manager
+    private String BackgroundColor()
+    {
+        return ThemeManager.ContainerColor;
+    }
+
+    //a scroll has occurred
+    private void Scroll(System.EventArgs e)
+    {
+        SharedTimer.Instance.OffsetGrabPending = true;
+        _pageManager.CanvasScrolled();
+    }
+
+    //initialization
+    private void InitOnce()
+    {
+
+
+        if (!_inited)
+        {
+
+            System.Console.WriteLine("INITING DRAWING CANVAS");
+
+            _jsManager = new JSInteropManager(JSRuntime, true);
+            _pageManager = new PageManager(_jsManager);
+
+            //assign the delegate that will call for redrawing of the page
+            _pageManager.Refresher = Refresh;
+            _pageManager.PageChanger = ChangePage;
+            _pageManager.MapCanvasHeightSet = ChangeCanvasHeight;
+            _inited = true;
+
+            _pageManager.Draw();
+
+            //         string jsonStr = JsonManager.Instance.TestMap();
+            //        JsonManager.Instance.Deserialize(jsonStr);
+
+            SharedTimer.Instance.RedrawPending = true;
+        }
+    }
+
+    //send key events to the keyboard manager
+    void KeyDown(KeyboardEventArgs e)
+    {
+        KeyboardManager.Instance.KeyDown(e);
+    }
+
+    protected override void OnInitialized()
+    {
+    }
+
+    //the mouse entered the canvas
+    void MouseEnter(MouseEventArgs e)
+    {
+
+
+
+        switch (ToolbarManager.Instance.SelectedButton)
+        {
+            case EToolbarButton.PAN:
+                _jsManager.SetCursor("all-scroll");
+                break;
+
+            case EToolbarButton.TEXT:
+                _jsManager.SetCursor("text");
+                break;
+
+            case EToolbarButton.SUBNET:
+                _jsManager.SetCursor("nwse-resize");
+                break;
+
+            case EToolbarButton.WebService:
+                _jsManager.SetCursor("img_webservice");
+                break;
+
+            case EToolbarButton.Router:
+                _jsManager.SetCursor("img_router");
+                break;
+
+            case EToolbarButton.Wireless:
+                _jsManager.SetCursor("img_wireless");
+                break;
+
+            case EToolbarButton.PLC:
+                _jsManager.SetCursor("img_plc");
+                break;
+
+            case EToolbarButton.Workstation:
+                _jsManager.SetCursor("img_workstation");
+                break;
+
+            case EToolbarButton.Switch:
+                _jsManager.SetCursor("img_switch");
+                break;
+
+            case EToolbarButton.Server:
+                _jsManager.SetCursor("img_server");
+                break;
+
+            case EToolbarButton.Laptop:
+                _jsManager.SetCursor("img_laptop");
+                break;
+
+            case EToolbarButton.Cloud:
+                _jsManager.SetCursor("img_cloud");
+                break;
+
+            case EToolbarButton.Printer:
+                _jsManager.SetCursor("img_printer");
+                break;
+
+            case EToolbarButton.Firewall:
+                _jsManager.SetCursor("img_firewall");
+                break;
+
+            case EToolbarButton.Mirror:
+                _jsManager.SetCursor("img_mirror");
+                break;
+
+            default:
+                _jsManager.SetCursor("default");
+                break;
+        }
+
+        handleMouse(EUserEventType.MOUSEENTER, e);
+    }
+
+    //a common way to represent mouse location
+    private string MouseString(string prefix, double x, double y)
+    {
+        return String.Format(prefix + " [{0:0.#}, {1:0.#}]", x, y);
+    }
+
+
+
+    //are all the items fully visible on screen in a horizontal sense?
+    private bool AllItemsFullyHVisible()
+    {
+        return GraphicsManager.Instance.AllItemsFullyHVisibleOnScreen();
+    }
+
+    //are all the items fully visible on screen in a vertical sense?
+    private bool AllItemsFullyVVisible()
+    {
+        return GraphicsManager.Instance.AllItemsFullyVVisibleOnScreen();
+    }
+
+    //are all the items visible in a horizontal sense on screen?
+    private string DisplayHScrollbar()
+    {
+        //    return AllItemsFullyHVisible() ? "none" : "normal";
+
+        return "normal";
+    }
+
+    //are all the items visible in a vertical sense on screen?
+    private string DisplayVScrollbar()
+    {
+        //    return AllItemsFullyVVisible() ? "none" : "normal";
+
+        return "normal";
+    }
+
+    //the mouse exited the canvas
+    void MouseExit(MouseEventArgs e)
+    {
+        handleMouse(EUserEventType.MOUSEEXIT, e);
+    }
+
+    //a mouse move has occurred
+    void MouseMove(MouseEventArgs e)
+    {
+        handleMouse(EUserEventType.MOUSEMOVE, e);
+    }
+
+    //a mouse up (release) has occurred
+    void MouseUp(MouseEventArgs e)
+    {
+        handleMouse(EUserEventType.MOUSEUP, e);
+    }
+
+    //a mouse down (press) has occurred
+    void MouseDown(MouseEventArgs e)
+    {
+        handleMouse(EUserEventType.MOUSEDOWN, e);
+    }
+
+    //a single (complete) click has occured
+    void SingleClick(MouseEventArgs e)
+    {
+        handleMouse(EUserEventType.SINGLECLICK, e);
+    }
+
+    //a double click has occured
+    void DoubleClick(MouseEventArgs e)
+    {
+        handleMouse(EUserEventType.DOUBLECLICK, e);
+    }
+
+    //handle the suite of mouse events, giving it to the
+    //page manager
+    private void handleMouse(EUserEventType etype, MouseEventArgs e)
+    {
+        _pageManager.MouseEvent(etype, e);
+    }
+
+    //convert the client coords to true local relative to corner of main canvas
+    private void ClientToLocal(MouseEventArgs e)
+    {
+        _pageManager.ClientToLocal(e);
+    }
+
+    //cause a refresh by declaring a state change
+    public void Refresh()
+    {
+        StateHasChanged(); //forces an update
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+
+        if (firstRender)
+        {
+      //      _inited = false;
+            ((IJSInProcessRuntime)JSRuntime).InvokeVoid("canvasDrawer.fixblur");
+            InitOnce();
+            ((IJSInProcessRuntime)JSRuntime).InvokeVoid("canvasDrawer.disableRightClickContextMenu");
+        }
+        //     InitOnce();
+
+        SharedTimer.Instance.RedrawPending = true;
+    }
+
+
+    //change the page
+    public void ChangePage(string page)
+    {
+        NavigationManager.NavigateTo(page);
+    }
+
+    //change the canvas height
+    public void ChangeCanvasHeight(string height)
+    {
+        SBHEIGHT = (string)height.Clone();
+        Refresh();
+    }
+
+    [JSInvokable("CanvasHeight")]
+    public static void CanvasHeight(int height)
+    {
+        _pageManager.CanvasHeight(height);
+    }
+
+}

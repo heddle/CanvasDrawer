@@ -1,0 +1,201 @@
+﻿@using CanvasDrawer.Graphics
+@using CanvasDrawer.Pages
+@using CanvasDrawer.Graphics.Popup
+@using CanvasDrawer.Graphics.Toolbar
+@using CanvasDrawer.Graphics.Keyboard
+@using CanvasDrawer.Graphics.Theme
+@inject IJSRuntime JSRuntime
+@namespace Popup
+<style>
+
+        .outerdiv {
+            position: absolute;
+            left:@PopupLeft();
+            top:@PopupTop();
+            width: @GetWidth();
+            height: inherit;
+            border-top: 1px solid white;
+            border-left: 1px solid white;
+            border-bottom: 1px solid black;
+            border-right: 1px solid black;
+        }
+
+        .pbtn-group {
+        }
+
+        .pbtn-group button {
+            background-color: @BackgroundColor();
+            padding-left: 6px;
+            border: none;
+            color:@TextColor();
+            cursor: pointer; /* Pointer/hand icon */
+            width: @GetWidth();
+            display: block; /* Make the buttons appear below each other */
+            text-align: left;
+            font-family: @FontFamily();
+            font-size: @FontSizeString();
+            pointer-events: all;
+        }
+
+            .pbtn-group button {
+                border-right: solid black 1px;
+            }
+
+
+        /* Add a background color on hover */
+        .pbtn-group button:hover {
+            background-color: @HoverColor();
+        }
+
+        .pbtn-group button:focus {
+            outline: none;
+        }
+</style>
+
+<div class="outerdiv" hidden=@PopupHidden()>
+    <div class="pbtn-group">
+        @foreach (var pustr in MenuLabels())
+        {
+            <button id="@pustr"
+                    @onclick="@(e => MenuSelected(e, pustr))">
+                @pustr
+            </button>
+        }
+    </div>
+</div>
+
+@code {
+
+    private String[] MenuLabels()
+    {
+
+        if (PopupManager.Instance == null)
+        {
+            return null;
+        }
+
+        return PopupManager.Instance.GetPopupLabels();
+    }
+
+    //get the width of the longest label
+    public String GetWidth()
+    {
+        int width = 0;
+
+        String[] labels = MenuLabels();
+        if (labels != null)
+        {
+            if (_inited)
+            {
+                foreach (String s in labels)
+                {
+                    double tw = _jsManager.TextWidth(s, FontFamily(), FontSize() + 1);
+                    width = Math.Max(width, (int)tw);
+                }
+            }
+        }
+
+
+
+        //padding
+        width += 40;
+        return width.ToString() + "px";
+    }
+
+    //one of the menu items was selected
+    public void MenuSelected(MouseEventArgs me, string label)
+    {
+        PopupManager.Instance.MenuSelected(label);
+    }
+
+    //X location of popup
+    private String PopupLeft()
+    {
+        return PopupManager.Instance.PopupX;
+    }
+
+    //Y location of popup
+    private String PopupTop()
+    {
+        return PopupManager.Instance.PopupY;
+    }
+
+    //is the popup up or down?
+    private bool PopupHidden()
+    {
+        return !PopupManager.Instance.PopupVisible;
+    }
+
+    //background color of popup
+    public String BackgroundColor()
+    {
+        return ThemeManager.PopupBackgroundColor;
+    }
+
+    //hover color of popup
+    public String HoverColor()
+    {
+        return ThemeManager.PopupHoverColor;
+    }
+
+    //text color of popup
+    public String TextColor()
+    {
+        return ThemeManager.PopupTextColor;
+    }
+
+    //font family
+    public String FontFamily()
+    {
+        return ThemeManager.PopupFont;
+    }
+
+    //font size as an int (pixels)
+    public int FontSize()
+    {
+        return ThemeManager.PopupFontSize;
+    }
+
+    //font size as a string
+    public String FontSizeString()
+    {
+        return FontSize().ToString() + "px";
+    }
+
+    //for calling javascript
+    private static JSInteropManager _jsManager = null;
+
+    //watch for initialization
+    private static bool _inited = false;
+
+    //initialization
+    private Task InitOnce()
+    {
+
+        if (!_inited)
+        {
+            _jsManager = new JSInteropManager(JSRuntime, false);
+            _inited = true;
+            PopupManager.Instance.Refresher = Refresh;
+            Refresh();
+        }
+        return Task.FromResult("done");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        if (firstRender)
+        {
+            _inited = false;
+            await InitOnce();
+        }
+        await InitOnce();
+    }
+
+    //force a redraw
+    public void Refresh()
+    {
+        StateHasChanged(); //forces an update
+    }
+}

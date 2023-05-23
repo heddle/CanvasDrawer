@@ -1,0 +1,303 @@
+﻿@using CanvasDrawer.Graphics
+@using CanvasDrawer.DataModel
+@using CanvasDrawer.Pages
+@using CanvasDrawer.Graphics.Items
+@using CanvasDrawer.Graphics.Editor
+@using CanvasDrawer.Graphics.Theme
+@using CanvasDrawer.Graphics.Connection
+@inject IJSRuntime JSRuntime
+@namespace TextColor
+<style>
+
+    div {
+        text-align: center;
+    }
+
+    .tclabel {
+        font-family: Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        font-size: 14px;
+        width: 100%;
+        text-align: left;
+        border: none;
+        color: @KeyTextColor();
+        background: @KeyBackground();
+    }
+
+    .tccontainer {
+        width: 160px;
+        height: @GetTextColorHeight();
+        background-color: @TextColorBackground();
+        border: solid;
+        border-width: 1px;
+        border-color: @TextColorBorderColor();
+        padding-left: 2px;
+        margin-left: 2px;
+        padding-top: 2px;
+        margin-top: 2px;
+        pointer-events: all;
+    }
+
+    .grid-container {
+        display: grid;
+        border-top: 1px solid @TextColorDividerColor();
+        border-bottom: none;
+        border-left: none;
+        border-right: none;
+        grid-template-columns: auto auto auto auto;
+        background-color: @TextColorBackground();
+        padding: 2px;
+        height: @GetGridContainerHeight();
+        width: 156px
+
+    }
+
+        .grid-container label {
+            background: @GetColor(0);
+            border: 2px solid black;
+            margin: 2px 2px; /* Some padding */
+            cursor: pointer; /* Pointer/hand icon */
+            float: left;
+            width: 26px;
+            height: 26px;
+            outline: none;
+            text-align: center;
+            margin-top: 4px;
+            pointer-events: all;
+            border-radius: 4px;
+        }
+
+     .grid-container label.label1 {
+            background: @GetColor(0);
+        }
+
+        .grid-container label.label2 {
+            background: @GetColor(1);
+        }
+
+        .grid-container label.label3 {
+            background: @GetColor(2);
+        }
+
+        .grid-container label.label4 {
+            background: @GetColor(3);
+        }
+
+        .grid-container label.label5 {
+            background: @GetColor(4);
+        }
+
+        .grid-container label.label6 {
+             background: @GetColor(5);
+        }
+
+        .grid-container label.label7 {
+             background: @GetColor(6);
+        }
+
+        .grid-container label.label8 {
+             background: @GetColor(7);
+        }
+
+
+</style>
+
+<div class="tccontainer" hidden="@IsHidden()">
+    <label class="tclabel">Text Color</label>
+
+    <div class="grid-container">
+        <label class="label1" id="@IDs[0]"
+               @onclick="@(e => Click(e, 0))">
+        </label>
+
+        <label class="label2" id="@IDs[1]"
+               @onclick="@(e => Click(e, 1))">
+        </label>
+
+        <label class="label3" id="@IDs[2]"
+               @onclick="@(e => Click(e, 2))">
+        </label>
+
+        <label class="label4" id="@IDs[3]"
+               @onclick="@(e => Click(e, 3))">
+        </label>
+
+        <label class="label5" id="@IDs[4]"
+               @onclick="@(e => Click(e, 4))">
+        </label>
+
+        <label class="label6" id="@IDs[5]"
+               @onclick="@(e => Click(e, 5))">
+        </label>
+        <label class="label7" id="@IDs[6]"
+               @onclick="@(e => Click(e, 6))">
+        </label>
+
+        <label class="label8" id="@IDs[7]"
+               @onclick="@(e => Click(e, 7))">
+        </label>
+    </div>
+</div>
+
+
+@code {
+
+
+    //item being edited
+    private static Item _hotItem;
+
+    static TextColorEditor _textColorEditor = null;
+
+    // have we initialized?
+    private static bool _inited = false;
+
+    static JSInteropManager _jsManager = null;
+
+    private static int _gridHeight = 66;
+
+    private static readonly String[] IDs = { "TL0", "TL1", "TL2", "TL3", "TL4", "TL5", "TL6", "TL7" };
+
+    //get the available color based on theme
+    private String GetColor(int i)
+    {
+        return ThemeManager.GetAvailableTextColor(i);
+    }
+
+    //clicked on a color swath
+    private void Click(MouseEventArgs e, int i)
+    {
+        string genericColor = ThemeManager.GetGenericColor(i);
+        ((TextItem)_hotItem).SetForeground(genericColor);
+        DirtyManager.Instance.SetDirty("Color change");
+        TextColorEditor.Instance.Restore();
+        GraphicsManager.Instance.ForceDraw();
+        FixLabels();
+        Refresh();
+    }
+
+    //get the height of the text color palette
+    private String GetTextColorHeight()
+    {
+        return (_gridHeight + 40).ToString() + "px";
+    }
+
+    //get the height of the text color palette
+    private String GetGridContainerHeight()
+    {
+        return _gridHeight.ToString() + "px";
+    }
+    //get the background color for the keys from the ThemeManager
+    public String KeyBackground()
+    {
+        return ThemeManager.EditorKeyBackground;
+    }
+
+    //get the text color for the keys from the ThemeManager
+    public String KeyTextColor()
+    {
+        return ThemeManager.EditorKeyTextColor;
+    }
+
+    //border around entire text color palette, shares color with editor
+    String TextColorBorderColor()
+    {
+        return ThemeManager.EditorBorderColor;
+    }
+
+    //line between header and text color palette proper, shares color with editor
+    String TextColorDividerColor()
+    {
+        return ThemeManager.EditorDividerColor;
+    }
+
+    //background color of text color palette, shares color with editor
+    String TextColorBackground()
+    {
+        return ThemeManager.EditorBackgroundColor;
+    }
+
+    //is the editor visible
+    bool IsTextColorPaletteEditorVisible()
+    {
+        return DisplayManager.Instance.IsTextColorEditorVisible();
+    }
+
+    //Should the component be hidded because the GUI
+    //is not editable
+    bool IsHidden()
+    {
+        return !IsTextColorPaletteEditorVisible();
+    }
+
+    //initialization
+    private Task InitOnce()
+    {
+
+        if (!_inited)
+        {
+            _jsManager = new JSInteropManager(JSRuntime, false);
+            _textColorEditor = TextColorEditor.Instance;
+            _textColorEditor.SetHotItem = SetHotItem;
+            _textColorEditor.Refresher = Refresh;
+            _inited = true;
+        }
+        return Task.FromResult("done");
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        if (firstRender)
+        {
+            _inited = false;
+            await InitOnce();
+        }
+        await InitOnce();
+    }
+
+    private void FixLabels()
+    {
+        String matchColor = (_hotItem != null) ? _hotItem.GetForeground() : "";
+        Console.WriteLine("MATCH COLOR: [" + matchColor + "]");
+
+        for (int i = 0; i < IDs.Length; i++)
+        {
+
+            bool match = ThemeManager.GetGenericColor(i).Equals(matchColor);
+            String bc = match ? ThemeManager.GetAvailableTextColorComplement(0) : GetColor(i);
+
+            _jsManager.ChangeBorder(IDs[i], bc);
+        }
+    }
+
+    //force a redraw of the editor
+    public void Refresh()
+    {
+        StateHasChanged(); //forces an update
+    }
+
+    //received a new hot item from palette editor
+    public void SetHotItem(Item item)
+    {
+
+        //mark old one as not being edited
+        if (_hotItem != null)
+        {
+            _hotItem.Editing = false;
+        }
+        _hotItem = item;
+
+        if (_hotItem == null)
+        {
+        }
+        else
+        {
+            _hotItem.Editing = true;
+        }
+
+        FixLabels();
+        Refresh(); //forces an update
+    }
+
+}

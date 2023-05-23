@@ -1,0 +1,401 @@
+﻿@using CanvasDrawer.Graphics
+@using CanvasDrawer.Pages
+@using CanvasDrawer.Graphics.Toolbar
+@using CanvasDrawer.Graphics.Keyboard
+@using CanvasDrawer.Graphics.Theme
+@using CanvasDrawer.Graphics.Popup;
+@inject IJSRuntime JSRuntime
+@namespace Toolbar
+<style>
+
+    .noutdiv {
+        outline: none;
+    }
+
+    .btn-group {
+        display: block;
+        border: none;
+        margin: 0;
+        padding: 0;
+        outline: none; /* no focus blur*/
+    }
+
+        .btn-group button {
+            border: 2px solid; /* border */
+            padding: 0px; /* Some padding */
+            cursor: pointer; /* Pointer/hand icon */
+            float: left; /* Float the buttons side by side */
+            width: 28px;
+            height: 28px;
+            margin-right: 1px;
+            margin-left: 2px;
+            margin-bottom: 2px;
+            outline: none; /* no focus blur*/
+            display: block;
+        }
+
+        /* Clear floats (clearfix hack) */
+        .btn-group:after {
+            content: "";
+            clear: both;
+        }
+
+        .btn-group button:first-of-type {
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+
+        .btn-group button:nth-of-type(4) {
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+        .btn-group button:nth-of-type(5) {
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+
+        .btn-group button:nth-of-type(6) {
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+
+        .btn-group button:nth-last-of-type(6) {
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+
+        .btn-group button:nth-last-of-type(3) {
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+
+
+        .btn-group button:nth-last-of-type(2) {
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+
+
+        .btn-group button:last-of-type {
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+</style>
+
+<div class="noutdiv" tabindex="2" @onkeydown="KeyDown">
+
+    <div class="noutdiv">
+
+        <div class="btn-group" id="toolbar">
+
+            <button id="pointer"
+                    title="default selector tool"
+                    @onclick="@(e => ButtonClick(e, "pointer"))"
+                    @onmouseover="@(e => MouseOver(e, "pointer"))"
+                    @onmouseout="@(e => MouseOut(e, "pointer"))">
+                <img src="images/select.svg">
+            </button>
+
+
+            <button id="pan"
+                    title="use to pan the diagram"
+                    @onclick="@(e => ButtonClick(e, "pan"))"
+                    @onmouseover="@(e => MouseOver(e, "pan"))"
+                    @onmouseout="@(e => MouseOut(e, "pan"))">
+                <img src="images/pan.svg">
+            </button>
+
+
+            <button id="zoomin"
+                    title="click to zoom in"
+                    @onclick="@(e => ButtonClick(e, "zoomin"))"
+                    @onmouseover="@(e => MouseOver(e, "zoomin"))"
+                    @onmouseout="@(e => MouseOut(e, "zoomin"))">
+                <img src="images/zoomIn.svg">
+            </button>
+
+            <button id="zoomout"
+                    title="click to zoom out"
+                    @onclick="@(e => ButtonClick(e, "zoomout"))"
+                    @onmouseover="@(e => MouseOver(e, "zoomout"))"
+                    @onmouseout="@(e => MouseOut(e, "zoomout"))">
+                <img src="images/zoomOut.svg">
+            </button>
+
+            <img src="images/transparent.png" width="32" height="32">
+
+            <button id="connector"
+                    title="create a connector"
+                    hidden="@IsHidden()"
+                    @onclick="@(e => ButtonClick(e, "connector"))"
+                    @onmousedown="@(e => MouseDown(e, "connector"))"
+                    @onmouseover="@(e => MouseOver(e, "connector"))"
+                    @onmouseout="@(e => MouseOut(e, "connector"))">
+                <img src=@ConnectorImageFile()>
+            </button>
+
+            <button id="subnet"
+                    title="create a subnet container"
+                    hidden="@IsHidden()"
+                    @onclick="@(e => ButtonClick(e, "subnet"))"
+                    @onmousedown="@(e => MouseDown(e, "subnet"))"
+                    @onmouseover="@(e => MouseOver(e, "subnet"))"
+                    @onmouseout="@(e => MouseOut(e, "subnet"))">
+                <img src=@ShapeImageFile()>
+            </button>
+
+            <img src="images/transparent.png" width="32" height="32">
+
+            <button id="text"
+                    title="create a text box"
+                    hidden="@IsHidden()"
+                    @onclick="@(e => ButtonClick(e, "text"))"
+                    @onmouseover="@(e => MouseOver(e, "text"))"
+                    @onmouseout="@(e => MouseOut(e, "text"))">
+                <img src="images/text.svg">
+            </button>
+
+            <button id="snap"
+                    title="snap items to the grid"
+                    hidden="@IsHidden()"
+                    @onclick="@(e => ButtonClick(e, "snap"))"
+                    @onmouseover="@(e => MouseOver(e, "snap"))"
+                    @onmouseout="@(e => MouseOut(e, "snap"))">
+                <img src="images/gridSnap.svg">
+            </button>
+
+            <button id="duplicateitems"
+                    title="click to duplicate selected items"
+                    hidden="@IsHidden()"
+                    @onclick="@(e => ButtonClick(e, "duplicateitems"))"
+                    @onmouseover="@(e => MouseOver(e, "duplicateitems"))"
+                    @onmouseout="@(e => MouseOut(e, "duplicateitems"))">
+                <img src="images/duplicate.svg">
+            </button>
+
+            <button id="deleteitems"
+                    title="click to delete selected items"
+                    hidden="@IsHidden()"
+                    @onclick="@(e => ButtonClick(e, "deleteitems"))"
+                    @onmouseover="@(e => MouseOver(e, "deleteitems"))"
+                    @onmouseout="@(e => MouseOut(e, "deleteitems"))">
+                <img src="images/delete.svg">
+            </button>
+
+            <img src="images/transparent.png" width="32" height="32">
+
+            <button id="edit"
+                    title="toggle edit mode"
+                    @onclick="@(e => ButtonClick(e, "edit"))"
+                    @onmouseover="@(e => MouseOver(e, "edit"))"
+                    @onmouseout="@(e => MouseOut(e, "edit"))">
+                <img src="images/editMode.svg">
+            </button>
+
+            <button id="theme"
+                    title="toggle the theme from light to dark"
+                    @onclick="@(e => ButtonClick(e, "theme"))"
+                    @onmouseover="@(e => MouseOver(e, "theme"))"
+                    @onmouseout="@(e => MouseOut(e, "theme"))">
+                <img src="images/darkMode.svg">
+            </button>
+
+        </div>
+    </div>
+
+</div>
+
+
+@code {
+
+    //for calling javascript
+    private static JSInteropManager _jsManager = null;
+
+    //watch for initialization
+    private static bool _inited = false;
+
+    //is the GUI editable
+    private bool IsEditable()
+    {
+        return DisplayManager.Instance.MapIsEditable();
+    }
+
+    //Should the component be hidded because the GUI
+    //is not editable
+    bool IsHidden()
+    {
+        return !IsEditable();
+    }
+
+    //get the image file name for the current subnet shape
+    private string ShapeImageFile()
+    {
+        if (SubnetShapeMenu.Instance != null)
+        {
+            //get the file with the menu carrot indicator
+            return SubnetShapeMenu.Instance.CurrentImageFile().Replace(".svg", "_carrot.svg");
+        }
+        else
+        {
+            return "images/sub_Rectangle_carrot.svg";
+        }
+    }
+
+    //get the image file name for the current connector
+    private string ConnectorImageFile()
+    {
+        if (ConnectorMenu.Instance != null)
+        {
+            //get the file with the menu carrot indicator
+            return ConnectorMenu.Instance.CurrentImageFile().Replace(".svg", "_carrot.svg");
+        }
+        else
+        {
+            return "images/connector_carrot.svg";
+        }
+    }
+
+
+    // is this the light theme
+    private bool IsLight()
+    {
+        return ThemeManager.IsLight;
+    }
+
+    //is this the dark theme
+    private bool IsDark()
+    {
+        return !IsLight();
+    }
+
+    //get the label color from the theme manager
+    private String LabelColor()
+    {
+        return ThemeManager.LabelColor;
+    }
+
+    //get the background color from the theme manager
+    private String BackgroundColor()
+    {
+        return ThemeManager.ContainerColor;
+    }
+
+
+    //A key down occured
+    void KeyDown(KeyboardEventArgs e)
+    {
+        KeyboardManager.Instance.KeyDown(e);
+    }
+
+    //initialization
+    private Task InitOnce()
+    {
+
+        if (!_inited)
+        {
+            _jsManager = new JSInteropManager(JSRuntime, false);
+            _inited = true;
+            ThemeManager.JsManager = _jsManager;
+            ToolbarManager.Instance.JsManager = _jsManager;
+            ToolbarManager.Instance.SetAllBackgrounds();
+            ToolbarManager.Instance.RefresherTools = Refresh;
+            ((IJSInProcessRuntime)JSRuntime).InvokeVoid("canvasDrawer.disableRightClickContextMenuOnShapeButton");
+            ((IJSInProcessRuntime)JSRuntime).InvokeVoid("canvasDrawer.disableRightClickContextMenuOnConnectorButton"); Refresh();
+        }
+        return Task.FromResult("done");
+    }
+
+    //mouse down on a button
+    public void MouseDown(MouseEventArgs me, string name)
+    {
+
+        if (me.Button == 2)
+        {
+            ToolbarManager.Instance.HandleRightClick(me, name);
+            return;
+        }
+    }
+
+    //one of the toolbar buttons was hit
+    public void ButtonClick(MouseEventArgs me, string name)
+    {
+
+        ToolbarButtonData data = ToolbarManager.Instance.GetButtonData(name);
+        if ((data != null) && data.Enabled)
+        {
+
+            string oldSelected = ToolbarManager.Instance.SelectButton(name);
+            ToolbarManager.Instance.SetButtonBackground(data);
+            ToolbarManager.Instance.SetButtonBackground(oldSelected);
+
+            if (!data.Selected)
+            {
+                ToolbarManager.Instance.SetButtonBackground("pointer");
+            }
+
+            ToolbarManager.Instance.HandleButtonClick(data);
+        }
+    }
+
+    //one of the toolbar button was entered
+    public void MouseOver(MouseEventArgs me, string name)
+    {
+        ToolbarButtonData data = ToolbarManager.Instance.GetButtonData(name);
+
+        if ((data != null) && data.Enabled)
+        {
+
+            if (data.Id.Equals("deleteitems"))
+            {
+                _jsManager.ChangeBackground(data.Id, ThemeManager.DeleteHighlight);
+                _jsManager.ChangeBorder(data.Id, ThemeManager.DeleteHighlight);
+            }
+            else
+            {
+                _jsManager.ChangeBackground(data.Id, ThemeManager.ButtonBackgrounds[ThemeManager.MOUSEON]);
+
+                if (data.Selected)
+                {
+                    _jsManager.ChangeBorder(data.Id, ThemeManager.SelectedButtonBorder);
+                }
+                else
+                {
+                    _jsManager.ChangeBorder(data.Id, ThemeManager.ButtonBackgrounds[ThemeManager.MOUSEON]);
+                }
+            }
+        }
+    }
+
+    //one of the toolbar buttons was exited
+    public void MouseOut(MouseEventArgs me, string name)
+    {
+        ToolbarButtonData data = ToolbarManager.Instance.GetButtonData(name);
+
+        if ((data != null) && data.Enabled)
+        {
+            ToolbarManager.Instance.SetButtonBackground(data);
+        }
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        if (firstRender)
+        {
+            _inited = false;
+            await InitOnce();
+        }
+        await InitOnce();
+    }
+
+    //force a redraw
+    public void Refresh()
+    {
+        StateHasChanged(); //forces an update
+    }
+
+}
