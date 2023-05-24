@@ -26,14 +26,10 @@ namespace CanvasDrawer.Graphics.Connection
 		//the item you broke from when reconnecting.
 		public Item BrokenLinkItem { get; set; }
 
-		//use thread safe singleton pattern
 		private static ConnectionManager _instance;
-		private static readonly object _padlock = new object();
 
 		//have to cache the line color for reconnects
 		private string _reconnectLineColor;
-
-		public PageManager PageManager { get; set; }
 
 		ConnectionManager() : base()
 		{
@@ -43,12 +39,10 @@ namespace CanvasDrawer.Graphics.Connection
 		//public accessor for the singleton
 		public static ConnectionManager Instance {
 			get {
-				lock (_padlock) {
-					if (_instance == null) {
-						_instance = new ConnectionManager();
-					}
-					return _instance;
+				if (_instance == null) {
+					_instance = new ConnectionManager();
 				}
+				return _instance;
 			}
 		}
 
@@ -101,7 +95,10 @@ namespace CanvasDrawer.Graphics.Connection
 
 			//need to save line color
 			Property prop = item.Properties.GetProperty(DefaultKeys.FG_COLOR);
-			_reconnectLineColor = String.Copy(prop.Value);
+
+			if (prop.Value != null) {
+				_reconnectLineColor = (string)prop.Value.Clone();
+			}
 			item.Delete();
 
 			GraphicsManager.Instance.ForceDraw();
@@ -203,7 +200,7 @@ namespace CanvasDrawer.Graphics.Connection
 
 						if (StateMachine.Instance.CurrentState == EState.Reconnect && (_reconnectLineColor != null)) {
 							Property prop = cnx.Properties.GetProperty(DefaultKeys.FG_COLOR);
-							prop.Value = String.Copy(_reconnectLineColor);
+							prop.Value = (string)_reconnectLineColor.Clone();
 						}
 						break;
 

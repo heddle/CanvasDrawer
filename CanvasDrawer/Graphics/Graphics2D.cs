@@ -1,6 +1,5 @@
-﻿using System;
+﻿using CanvasDrawer.Graphics.Theme;
 using CanvasDrawer.Pages;
-using CanvasDrawer.Graphics.Theme;
 
 /*
  * This is the graphics context.
@@ -8,7 +7,7 @@ using CanvasDrawer.Graphics.Theme;
 
 namespace CanvasDrawer.Graphics
 {
-	public class Graphics2D
+    public class Graphics2D
 	{
 
 		//default fill color is transparent gray
@@ -44,9 +43,9 @@ namespace CanvasDrawer.Graphics
 			LineWidth = src.LineWidth;
 			LineStyle = src.LineStyle;
 			FontSize = src.FontSize;
-			FontFamily = string.Copy(src.FontFamily);
-			TextColor = string.Copy(src.TextColor);
-			FontAlign = string.Copy(src.FontAlign);
+			FontFamily = (string)src.FontFamily.Clone();
+			TextColor = (string)src.TextColor.Clone();
+			FontAlign = (string)src.FontAlign.Clone();
 		}
 
 		/// <summary>

@@ -12,35 +12,28 @@ namespace CanvasDrawer.Graphics.Reshape {
         private static readonly string TRANSCOLOR = "rgba(95%,85%,85%,0.25)";
         private static readonly string BORDCOLOR = "#555555";
 
+        private static ReshapeManager? _instance;
 
-        public PageManager PageManager { get; set; }
+        private UserEvent? _startEvent;
+        private Rect? _startRect;
 
-        //use thread safe singleton pattern
-        private static ReshapeManager _instance;
-        private static readonly object _padlock = new object();
-
-        private UserEvent _startEvent;
-        private Rect _startRect;
-
-        private Item _hotItem;
+        private Item? _hotItem;
 
         ReshapeManager() : base() {
         }
 
-        //public accessor for the singleton
-        public static ReshapeManager Instance {
-            get {
-                lock (_padlock) {
-                    if (_instance == null) {
-                        _instance = new ReshapeManager();
-                    }
-                    return _instance;
-                }
-            }
-        }
+		//public accessor for the singleton
+		public static ReshapeManager Instance {
+			get {
+				if (_instance == null) {
+					_instance = new ReshapeManager();
+				}
+				return _instance;
+			}
+		}
 
-        //Initiate the reshaping
-        public void InitReshape(Item item, UserEvent ue) {
+		//Initiate the reshaping
+		public void InitReshape(Item item, UserEvent ue) {
 
             _hotItem = item;
             _hotItem.Reshaping = true;
@@ -63,8 +56,11 @@ namespace CanvasDrawer.Graphics.Reshape {
             if (JSInteropManager.Instance != null) {
 				JSInteropManager.Instance.RestoreCanvasFromBackgroundImage();
             }
-            _hotItem.Reshaping = false;
-            _hotItem.AfterReshape();
+
+            if (_hotItem != null) {
+                _hotItem.Reshaping = false;
+                _hotItem.AfterReshape();
+            }
             _hotItem = null;
             _startEvent = null;
             _startRect = null;
@@ -75,7 +71,8 @@ namespace CanvasDrawer.Graphics.Reshape {
         /// </summary>
         /// <param name="ue"></param>
         public void UpdateReshape(UserEvent ue) {
-            if (_hotItem.IsSubnet()) {
+
+             if ((_hotItem != null) && _hotItem.IsSubnet()) {
                 UpdateBox(ue);
             }
         }

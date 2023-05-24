@@ -20,7 +20,7 @@ namespace CanvasDrawer.Graphics {
     public sealed class GraphicsManager {
 
         //map name
-        public String MapName { get; set; } = "MyMap";
+        public String DrawingName { get; set; } = "MyCanvas";
 
         //snap to grid
         public static readonly int VirtualGridSize = 15;
@@ -29,7 +29,7 @@ namespace CanvasDrawer.Graphics {
         private UserEvent _lastEvent = new UserEvent();
 
         //use thread safe singleton pattern
-        private static GraphicsManager _instance;
+        private static GraphicsManager? _instance;
         private static readonly object _padlock = new object();
 
         //the visual rect, used to check if something neets to be drawn

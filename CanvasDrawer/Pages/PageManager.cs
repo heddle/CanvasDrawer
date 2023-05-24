@@ -44,13 +44,13 @@ namespace CanvasDrawer.Pages {
 
             //wake up all managers
             GraphicsManager.Instance.PageManager = this;
-            ToolbarManager.Instance.PageManager = this;
-            RubberbandManager.Instance.PageManager = this;
-            ReshapeManager.Instance.PageManager = this;
-            ConnectionManager.Instance.PageManager = this;
-            JsonManager.Instance.PageManager = this;
+			ToolbarManager.Instance.PageManager = this;
+			JsonManager.Instance.PageManager = this;
             //wake up other managers
-            _ = SharedTimer.Instance;
+            _ = RubberbandManager.Instance;
+            _ = ConnectionManager.Instance;
+            _ = ReshapeManager.Instance;
+			_ = SharedTimer.Instance;
             _ = DragManager.Instance;
             _ = PropertyEditor.Instance;
             _ = SelectionManager.Instance;
@@ -97,10 +97,10 @@ namespace CanvasDrawer.Pages {
                 return null;
             }
 
-            Rect r = jsm.CanvasScrollBoundaryRect();
-
             jsm.CheckScale();
 
+
+            Rect r = jsm.CanvasScrollBoundaryRect();
             r.X /= jsm.Scale.X;
             r.Y /= jsm.Scale.Y;
             r.Width /= jsm.Scale.X;
@@ -154,7 +154,9 @@ namespace CanvasDrawer.Pages {
         }
 
         public void CanvasScrolled() {
-            Refresher();
+            if (Refresher != null) {
+                Refresher();
+            }
             SharedTimer.Instance.PageManagerRefreshPending = true;
         }
 

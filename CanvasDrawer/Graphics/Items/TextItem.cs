@@ -64,7 +64,7 @@ namespace CanvasDrawer.Graphics.Items {
         /// </summary>
         /// <param name="item">The text item in question.</param>
         /// <returns>The font family.</returns>
-		public static String GetFontFamily(TextItem item) {
+		public static String? GetFontFamily(TextItem item) {
             Property prop = item.Properties.GetProperty(DefaultKeys.FONTFAMILY);
 			if (prop == null) {
                 prop = item.FeedbackableOnly(DefaultKeys.FONTFAMILY, "Roboto");
@@ -85,13 +85,15 @@ namespace CanvasDrawer.Graphics.Items {
                 prop = item.FeedbackableOnly(DefaultKeys.FONTSIZE, "12");
             }
 
-			int fs;
-			try {
-                fs = Int32.Parse(prop.Value);
+			int fs = 12;
+            if (prop.Value != null) {
+				try {
+					fs = Int32.Parse(prop.Value);
+				} catch (Exception) {
+					fs = 12;
+				}
 			}
-			catch (Exception) {
-                fs = 12;
-			}
+
             return fs;
         }
 
@@ -106,12 +108,13 @@ namespace CanvasDrawer.Graphics.Items {
                 prop = item.FeedbackableOnly(DefaultKeys.MARGINH, "2");
             }
 
-            int margin;
-            try {
-                margin = Int32.Parse(prop.Value);
-            }
-            catch (Exception) {
-                margin = 2;
+            int margin = 2;
+            if (prop.Value != null) {
+                try {
+                    margin = Int32.Parse(prop.Value);
+                } catch (Exception) {
+                    margin = 2;
+                }
             }
             return margin;
         }
@@ -127,12 +130,13 @@ namespace CanvasDrawer.Graphics.Items {
                 prop = item.FeedbackableOnly(DefaultKeys.MARGINV, "2");
             }
 
-            int margin;
-            try {
-                margin = Int32.Parse(prop.Value);
-            }
-            catch (Exception) {
-                margin = 2;
+            int margin = 2;
+            if (prop.Value != null) {
+                try {
+                    margin = Int32.Parse(prop.Value);
+                } catch (Exception) {
+                    margin = 2;
+                }
             }
             return margin;
         }

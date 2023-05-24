@@ -31,12 +31,21 @@ namespace CanvasDrawer.Graphics {
             Set(src.X, src.Y, src.Width, src.Height);
         }
 
+        /// <summary>
+        /// Create a Rect from two points
+        /// </summary>
+        /// <param name="p1">One corner</param>
+        /// <param name="p2">Opposite corner</param>
         public Rect(DoublePoint p1, DoublePoint p2) {
             Set(p1, p2);
          }
 
-        //set from two points
-        public void Set(DoublePoint p1, DoublePoint p2) {
+		/// <summary>
+		/// Set the Rect from two points
+		/// </summary>
+		/// <param name="p1">One corner</param>
+		/// <param name="p2">Opposite corner</param>
+		public void Set(DoublePoint p1, DoublePoint p2) {
             double x = Math.Min(p1.X, p2.X);
             double y = Math.Min(p1.Y, p2.Y);
             double width = Math.Abs(p2.X - p1.X);

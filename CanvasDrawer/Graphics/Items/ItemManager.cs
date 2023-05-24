@@ -9,7 +9,7 @@ namespace CanvasDrawer.Graphics.Items {
 
 
         //use thread safe singleton pattern
-        private static ItemManager _instance;
+        private static ItemManager? _instance;
         private static readonly object _padlock = new object();
 
         //interested in item events

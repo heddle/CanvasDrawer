@@ -50,7 +50,7 @@ namespace CanvasDrawer.DataModel
 		/// Convenience method to get the name property
 		/// </summary>
 		/// <returns>The name property.</returns>
-		public string GetName()
+		public string? GetName()
 		{
 			return GetValue(DefaultKeys.NAME_KEY);
 		}
@@ -59,7 +59,7 @@ namespace CanvasDrawer.DataModel
 		/// Convenience method to get the icon property
 		/// </summary>
 		/// <returns>The icon property.</returns>
-		public string GetIcon()
+		public string? GetIcon()
 		{
 			return GetValue(DefaultKeys.ICON_KEY);
 		}
@@ -68,7 +68,7 @@ namespace CanvasDrawer.DataModel
 		/// Convenience method to get the font size property
 		/// </summary>
 		/// <returns>The font size property.</returns>
-		public string GetFontSize()
+		public string? GetFontSize()
 		{
 			return GetValue(DefaultKeys.FONTSIZE);
 		}
@@ -79,8 +79,8 @@ namespace CanvasDrawer.DataModel
 		{
 			Property prop = GetProperty(key);
 
-			if (prop != null) {
-				prop.Value = string.Copy(value);
+			if ((prop != null) && (prop.Value != null)) {
+				prop.Value = (string)value.Clone();
 				return true;
 			} else {
 				return false;
@@ -89,13 +89,13 @@ namespace CanvasDrawer.DataModel
 
 		//Get a value from a key. Return null if
 		//a property with that key is not found
-		public string GetValue(string key)
+		public string? GetValue(string key)
 		{
 			Property prop = GetProperty(key);
-			if (prop == null) {
+			if ((prop == null) || (prop.Value == null)) {
 				return null;
 			}
-			return string.Copy(prop.Value);
+			return (string)prop.Value.Clone();
 		}
 
 		//get the property from a key
@@ -200,7 +200,7 @@ namespace CanvasDrawer.DataModel
 		public void SetGlobal()
 		{
 			CreateProperty(DefaultKeys.MAPNAME,
-				GraphicsManager.Instance.MapName, 0);
+				GraphicsManager.Instance.DrawingName, 0);
 
 			CreateProperty(DefaultKeys.SHOWGRID,
 				DisplayManager.Instance.ShowGrid.ToString(), 0);

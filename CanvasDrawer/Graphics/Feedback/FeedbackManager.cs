@@ -12,16 +12,16 @@ namespace CanvasDrawer.Graphics.Feedback {
     public class FeedbackManager {
 
         //use thread safe singleton pattern
-        private static FeedbackManager _instance;
+        private static FeedbackManager? _instance;
         private static readonly object _padlock = new object();
 
         //used to update the status of the corresponding razor component
         public delegate void Refresh();
-        public Refresh Refresher { get; set; }
+        public Refresh? Refresher { get; set; }
 
 
         public delegate void FeedbackUpdate(List<string> fbstrings);
-        public FeedbackUpdate FeedbackUpdater { get; set; }
+        public FeedbackUpdate? FeedbackUpdater { get; set; }
 
         //list for holding fedback
         private List<string> _feedbackStrings;
@@ -61,7 +61,7 @@ namespace CanvasDrawer.Graphics.Feedback {
             //is the canvas dirty
             _feedbackStrings.Add(DirtyManager.Instance.ToString());
 
-			JSInteropManager? jsm = JSInteropManager.Instance;
+			var jsm = JSInteropManager.Instance;
 			if (jsm == null) {
 				return;
 			}
@@ -90,7 +90,9 @@ namespace CanvasDrawer.Graphics.Feedback {
                 item.AddFeedback(ue, _feedbackStrings);
             }
 
-            FeedbackUpdater(_feedbackStrings);
+            if (FeedbackUpdater != null) {
+                FeedbackUpdater(_feedbackStrings);
+            }
 
         }
     }

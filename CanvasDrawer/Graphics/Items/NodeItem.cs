@@ -97,7 +97,7 @@ namespace CanvasDrawer.Graphics.Items {
             FeedbackableOnly(DefaultKeys.FG_COLOR, "none");
             FeedbackableOnly(DefaultKeys.LINE_WIDTH, "0.5");
             FeedbackableOnly(DefaultKeys.ICON_KEY, Icon);
-            FeedbackableOnly(DefaultKeys.TYPE_KEY, string.Copy(EItemType.Node.ToString()));
+            FeedbackableOnly(DefaultKeys.TYPE_KEY, (string)EItemType.Node.ToString().Clone());
 
             AllFeatures(DefaultKeys.NAME_KEY, Icon);
 

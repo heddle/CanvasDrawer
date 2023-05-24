@@ -252,7 +252,7 @@ namespace CanvasDrawer.Pages {
             return _offsetTop;
         }
 
-        //get the width of the map canvas
+        //get the width of the canvas
         public double GetCanvasWidth() {
             try {
                 string result = _synchRT.Invoke<string>("canvasDrawer.canvasWidth");
@@ -264,7 +264,7 @@ namespace CanvasDrawer.Pages {
             }
         }
 
-        //Get the height of the map canvas
+        //Get the height of the canvas
         public double GetCanvasHeight() {
             try {
                 string result = _synchRT.Invoke<string>("canvasDrawer.canvasHeight");
@@ -317,6 +317,10 @@ namespace CanvasDrawer.Pages {
         public void DrawArc(double x, double y, double rad,
             double startAngle, double endAngle, string fillColor, string borderColor, double lineWidth, double dashLength) {
             CheckScale();
+
+            if (Scale == null) {
+                return;
+            }
             double avgScale = (Scale.X + Scale.Y) / 2.0;
 
             _ = _synchRT.Invoke<string>("canvasDrawer.drawArc", Scale.X * x, Scale.Y * y, avgScale * rad, startAngle, endAngle,
@@ -328,7 +332,12 @@ namespace CanvasDrawer.Pages {
 
             CheckScale();
 
-            if (!CheckDouble(Scale.X) || !CheckDouble(Scale.Y)) {
+
+			if (Scale == null) {
+				return;
+			}
+
+			if (!CheckDouble(Scale.X) || !CheckDouble(Scale.Y)) {
                 return;
             }
 
@@ -465,9 +474,9 @@ namespace CanvasDrawer.Pages {
         }
 
 			/// <summary>
-			/// Get the rectangle bounded by the map scroll bars.
+			/// Get the rectangle bounded by the canvas scroll bars.
 			/// </summary>
-			/// <returns>the rectangle bounded by the map scroll bars.</returns>
+			/// <returns>the rectangle bounded by the canvas scroll bars.</returns>
 			public Rect CanvasScrollBoundaryRect() {
             Rect r = ClientBoundingRect("dcboundary");
             r.Move(-GetCanvasOffsetLeft(), -GetCanvasOffsetTop());

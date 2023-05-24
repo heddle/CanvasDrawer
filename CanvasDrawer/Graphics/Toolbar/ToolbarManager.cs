@@ -219,8 +219,8 @@ namespace CanvasDrawer.Graphics.Toolbar {
                 Enabled = enabled,
                 Type = etype,
                 Group = group,
-                Id = String.Copy(id),
-                ImageId = (imageId == null) ? null : String.Copy(imageId),
+                Id = (string)id.Clone(),
+                ImageId = (imageId == null) ? null : (string)imageId.Clone(),
                 IsTool = isTool
             };
             _buttons.Add(data);

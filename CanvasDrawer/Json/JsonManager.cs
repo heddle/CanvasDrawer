@@ -14,18 +14,17 @@ namespace CanvasDrawer.Json {
     public class JsonManager {
 
         //the page manager
-        public PageManager PageManager { get; set; }
+        public PageManager? PageManager { get; set; }
 
         //use thread safe singleton pattern
-        private static JsonManager _instance;
-        private static readonly object _padlock = new object();
+        private static JsonManager? _instance;
 
         public delegate void JsonExtRead(string jsonStr);
-        public JsonExtRead JsonExtReader { get; set; }
+        public JsonExtRead? JsonExtReader { get; set; }
 
         // delegate will be assigned to the refresher
         public delegate void PageRefresh();
-        public PageRefresh Refresher { get; set; }
+        public PageRefresh? Refresher { get; set; }
 
         //current json (pretty) text
         public string JsonText { get; set; } = "";
@@ -36,24 +35,25 @@ namespace CanvasDrawer.Json {
         JsonManager() : base() {
         }
 
-        /// <summary>
-        /// Public access to the singleton
-        /// </summary>
-        public static JsonManager Instance {
-            get {
-                lock (_padlock) {
-                    if (_instance == null) {
-                        _instance = new JsonManager();
-                    }
-                    return _instance;
-                }
-            }
-        }
+		/// <summary>
+		/// Public access to the singleton
+		/// </summary>
+		public static JsonManager Instance {
+			get {
+				if (_instance == null) {
+					_instance = new JsonManager();
+				}
+				return _instance;
+			}
+		}
 
-        /// <summary>
-        /// Reached by CTRL-shift-J but not in reased (REACT) build.
-        /// </summary>
-        public void FillJSonPage() {
+		/// <summary>
+		/// Reached by CTRL-shift-J but not in reased (REACT) build.
+		/// </summary>
+		public void FillJSonPage() {
+            if ((PageManager == null) || (PageManager.PageChanger == null)) {
+                return;
+            }
             JsonText = Serialize();
             PageManager.PageChanger("jsonpage");
 
@@ -99,13 +99,12 @@ namespace CanvasDrawer.Json {
         //deserialize the global properties
         private void DeserializeGlobal(Properties props) {
             Property prop = props.GetProperty(DefaultKeys.MAPNAME);
-            if (prop != null) {
-                string mName = prop.Value;
-                GraphicsManager.Instance.MapName = String.Copy(mName);
+            if ((prop != null) && (prop.Value != null)) {
+                GraphicsManager.Instance.DrawingName = (string)prop.Value.Clone();
             }
 
             prop = props.GetProperty(DefaultKeys.SHOWGRID);
-            if (prop != null) {
+            if ((prop != null) && (prop.Value != null)) {
                 DisplayManager.Instance.ShowGrid = bool.Parse(prop.Value);
             }
             else {
@@ -118,7 +117,7 @@ namespace CanvasDrawer.Json {
         /// </summary>
         public void DeserializeFromLocalStorage() {
             if (JSInteropManager.Instance != null) {
-                string jsonStr = JSInteropManager.Instance.LocalStorageGetString(GraphicsManager.Instance.MapName);
+                string jsonStr = JSInteropManager.Instance.LocalStorageGetString(GraphicsManager.Instance.DrawingName);
                 Deserialize(jsonStr);
             }
         }
@@ -145,7 +144,7 @@ namespace CanvasDrawer.Json {
 
             //put in local storage
             if (JSInteropManager.Instance != null) {
-                string mapName = string.Copy(GraphicsManager.Instance.MapName);
+				string mapName = (string)GraphicsManager.Instance.DrawingName.Clone();
                 JSInteropManager.Instance.LocalStoragePutString(mapName, jsonStr);
             }
 
@@ -162,7 +161,7 @@ namespace CanvasDrawer.Json {
                     AllowTrailingCommas = true
                 };
 
-                List<Properties> propList =
+                List<Properties>? propList =
                     JsonSerializer.Deserialize<List<Properties>>(jsonStr, options);
 
                 if ((propList != null) && (propList.Count > 0)) {
@@ -183,30 +182,19 @@ namespace CanvasDrawer.Json {
                         }
                         else {
                             Property prop = props.GetProperty(DefaultKeys.TYPE_KEY);
-                            EItemType type = Item.FromString(prop.Value);
 
-                            if (type == EItemType.Node) {
-                                nodeList.Add(props);
-                            }
-                            else if (type == EItemType.LineConnector) {
-                                lineConnectorList.Add(props);
-                            }
+                            if ((prop != null) && (prop.Value != null)) {
+                                EItemType type = Item.FromString(prop.Value);
 
-                            //elbows are deprecated. This is for backwards compatibility
-                            else if (type == EItemType.ElbowConnector) {
-                                type = EItemType.LineConnector;
-                                prop.Value = type.ToString();
-
-                                //remove deprecated property
-                                props.Remove(DefaultKeys.HORIZFIRST);
-                                //make it a line
-                                lineConnectorList.Add(props);
-                            }
-                            else if (type == EItemType.NodeBox) {
-                                nodeBoxList.Add(props);
-                            }
-                            else if (type == EItemType.Text) {
-                                textList.Add(props);
+                                if (type == EItemType.Node) {
+                                    nodeList.Add(props);
+                                } else if (type == EItemType.LineConnector) {
+                                    lineConnectorList.Add(props);
+                                } else if (type == EItemType.NodeBox) {
+                                    nodeBoxList.Add(props);
+                                } else if (type == EItemType.Text) {
+                                    textList.Add(props);
+                                }
                             }
                         }  //else (not global)
                     } //for each

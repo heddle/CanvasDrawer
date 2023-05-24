@@ -20,8 +20,8 @@ namespace CanvasDrawer.Graphics.Items {
         //connection point drawing
         protected static readonly int CONNECTSIZE = 8;
 
-        public Item StartItem { get; set; }
-        public Item EndItem { get; set; }
+        public Item? StartItem { get; set; }
+        public Item? EndItem { get; set; }
 
         public ConnectorItem(Layer layer, Item startItem, 
             Item endItem) : base(layer, new Rect(0, 0, 0, 0)) {
@@ -37,8 +37,8 @@ namespace CanvasDrawer.Graphics.Items {
         /// Set the cusom properties for the connector.
         /// </summary>
         public virtual void CustomizeProperties() {
-            FeedbackableOnly(DefaultKeys.STARTGUID, StartItem.GuidString());
-            FeedbackableOnly(DefaultKeys.ENDGUID, EndItem.GuidString());
+            FeedbackableOnly(DefaultKeys.STARTGUID, (StartItem == null) ? "???" : StartItem.GuidString());
+            FeedbackableOnly(DefaultKeys.ENDGUID, (EndItem == null) ? "???": EndItem.GuidString());
             FeedbackableOnly(DefaultKeys.LINE_STYLE, ELineStyle.SOLID.ToString());
             FeedbackableOnly(DefaultKeys.LINE_WIDTH, "1");
             FeedbackableOnly(DefaultKeys.FG_COLOR, ThemeManager.DefaultConnectorLineColor);
@@ -51,7 +51,7 @@ namespace CanvasDrawer.Graphics.Items {
         /// <returns></returns>
         public string GetSelectedColor() {
             Property prop = Properties.GetProperty(DefaultKeys.SELECT_COLOR);
-            return (prop != null) ? prop.Value : ThemeManager.ConnectorSelectColor;
+            return ((prop != null) && (prop.Value != null)) ? prop.Value : ThemeManager.ConnectorSelectColor;
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace CanvasDrawer.Graphics.Items {
         /// <param name="x">The x coordinate.</param>
         /// <param name="y">The y coordinate.</param>
         /// <returns>The farther item, either the StartItem or the EndItem.</returns>
-        public Item FartherItem(double x, double y) {
+        public Item? FartherItem(double x, double y) {
             double delx1 = Start.X - x;
             double dely1 = Start.Y - y;
 
@@ -174,8 +174,8 @@ namespace CanvasDrawer.Graphics.Items {
                 base.AddFeedback(ue, feedbackStrings);
                 feedbackStrings.Add("Distance " + DistanceTo(ue.X, ue.Y));
 
-                string name1 = StartItem.Name();
-                string name2 = EndItem.Name();
+                string name1 = (StartItem == null) ? "???" : StartItem.Name();
+                string name2 = (EndItem == null) ? "???" : EndItem.Name();
                 feedbackStrings.Add("connects " + name1 + " to " +name2);
 
             }

@@ -11,20 +11,16 @@ namespace CanvasDrawer.Graphics.Rubberband {
 
         public int ClickCount { get; set; }
 
-        public PageManager PageManager { get; set; }
-
-        //use thread safe singleton pattern
-        private static RubberbandManager _instance;
-        private static readonly object _padlock = new object();
+        private static RubberbandManager? _instance;
 
         private Rect? rbRect;
 
         //am i currently rubber banding?
         //the start of the rubber band
-        private UserEvent _startEvent;
+        private UserEvent? _startEvent;
 
         //the current mode
-        private ERubberbandMode _mode;
+        private ERubberbandMode? _mode;
 
         //picks the colors in RECTANGLE mode
         private int _option;
@@ -32,24 +28,27 @@ namespace CanvasDrawer.Graphics.Rubberband {
         RubberbandManager() : base() {
         }
 
-        public static RubberbandManager Instance {
-            get {
-                lock (_padlock) {
-                    if (_instance == null) {
-                        _instance = new RubberbandManager();
-                    }
-                    return _instance;
-                }
-            }
-        }
+		/// <summary>
+		/// public access to the singleton
+		/// </summary>
+		public static RubberbandManager Instance {
+			get {
 
-        /// <summary>
-        /// Initialize the rubber banding
-        /// </summary>
-        /// <param name="mode">The mode, e.g. RECTANGLE, LINE, ELLIPSE, CLOUD</param>
-        /// <param name="ue">The mouse event.</param>
-        /// <param name="option"></param>
-        public void InitRubberbanding(ERubberbandMode mode, UserEvent ue, int option)
+				if (_instance == null) {
+					_instance = new RubberbandManager();
+				}
+				return _instance;
+
+			}
+		}
+
+		/// <summary>
+		/// Initialize the rubber banding
+		/// </summary>
+		/// <param name="mode">The mode, e.g. RECTANGLE, LINE, ELLIPSE, CLOUD</param>
+		/// <param name="ue">The mouse event.</param>
+		/// <param name="option"></param>
+		public void InitRubberbanding(ERubberbandMode mode, UserEvent ue, int option)
 		{
 			_option = Math.Max(0, Math.Min(1, option));
 			_startEvent = new UserEvent(ue);

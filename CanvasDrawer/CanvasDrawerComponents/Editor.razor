@@ -383,7 +383,7 @@
     static PropertyEditor _propertyEditor = null;
 
     //the actual item being edited
-    private static Item _hotItem;
+    private static Item? _hotItem;
 
     private static bool _inited = false;
 
@@ -447,12 +447,23 @@
     private void TextAreaInput(ChangeEventArgs ce)
     {
 
+        if ((ce == null) || (ce.Value == null))
+        {
+            return;
+        }
+
+        string? vstr = ce.Value.ToString();
+        if (vstr == null)
+        {
+            return;
+        }
+
         if (_hotItem != null)
         {
             Property prop = _hotItem.Properties.GetProperty(DefaultKeys.TEXT_KEY);
-            if (prop != null)
+            if ((prop != null) && (vstr != null))
             {
-                prop.Value = (string)(ce.Value.ToString().Clone());
+                prop.Value = (string)vstr.Clone();
                 DirtyManager.Instance.SetDirty("Property Changed");
                 FixTitle();
                 Update();
@@ -495,9 +506,12 @@
     {
         foreach (Property prop in PropertyArray)
         {
-            if (prop.Key.Equals(key))
+            if ((prop != null) && (prop.Key != null) && (prop.Value != null))
             {
-                return String.Copy(prop.Value);
+                if (prop.Key.Equals(key))
+                {
+                    return (String)prop.Value.Clone();
+                }
             }
         }
         return "???";
@@ -522,9 +536,12 @@
     {
         foreach (Property prop in PropertyArray)
         {
-            if (prop.Key.Equals(DefaultKeys.LOCKED_KEY))
+            if ((prop != null) && (prop.Key != null) && (prop.Value != null))
             {
-                return String.Copy(prop.Value);
+                if (prop.Key.Equals(DefaultKeys.LOCKED_KEY))
+                {
+                    return (String)prop.Value.Clone();
+                }
             }
         }
         return "???";
@@ -613,7 +630,7 @@
                 {
                     if (prop.Key.Equals(DefaultKeys.FONTSIZE))
                     {
-                        prop.Value = String.Copy(selection);
+                        prop.Value = (string)selection.Clone();
                         DirtyManager.Instance.SetDirty("Changed Font Size");
                         Update();
                         break;
@@ -816,7 +833,7 @@
             }
             else
             {
-                String icon = _hotItem.Properties.GetIcon();
+                String? icon = _hotItem.Properties.GetIcon();
                 if ((icon == null) || (icon.Length < 3))
                 {
                     HotItemText = _hotItem.Properties.GetName();

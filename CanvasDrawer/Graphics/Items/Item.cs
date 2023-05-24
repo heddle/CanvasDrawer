@@ -747,11 +747,6 @@ namespace CanvasDrawer.Graphics.Items {
             else if (EItemType.Text.ToString("g").Equals(name)) {
                 return EItemType.Text;
             }
-
-            //kept for backwards compatibility
-            else if (EItemType.ElbowConnector.ToString("g").Equals(name)) {
-                return EItemType.ElbowConnector;
-            }
             return EItemType.Unknown;
         }
 

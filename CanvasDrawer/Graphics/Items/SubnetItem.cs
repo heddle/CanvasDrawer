@@ -109,7 +109,7 @@ namespace CanvasDrawer.Graphics.Items {
         /// and the IP address
         /// </summary>
         /// <returns>The display string for this subnet.</returns>
-        public string NameDisplayString() {
+        public string? NameDisplayString() {
 
             if (Properties == null) {
                 return null;
@@ -117,10 +117,10 @@ namespace CanvasDrawer.Graphics.Items {
 
             string displayStr = "";
             Property nameProp = Properties.GetProperty(DefaultKeys.NAME_KEY);
-            if ((nameProp != null) && nameProp.DisplayedOnCanvas) {
+            if ((nameProp != null) && (nameProp.Value != null) && nameProp.DisplayedOnCanvas) {
                 String name = nameProp.Value;
                 if (name != null) {
-                    displayStr = String.Copy(name);
+                    displayStr = (string)name.Clone();
                 }
             }
 

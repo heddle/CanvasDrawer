@@ -269,12 +269,12 @@
     private void InitOnce()
     {
         GraphicsManager.Instance.CanvasRefresher = Refresh;
-        JsonManager.Instance.JsonExtReader = RenderMapFromJsonString;
+        JsonManager.Instance.JsonExtReader = RenderCanvasFromJsonString;
 
 
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
 
@@ -304,20 +304,10 @@
         NavigationManager.LocationChanged -= LocationChanged;
     }
 
-    /// <summary>
-    /// Tell page wrapper that the net map component is ready.
-    /// Likely, this is used to know when it is ok to pass in a json string
-    /// from the page wrapper, representing a net map to render.
-    /// </summary>
-    /// <returns></returns>
-    private async Task CanvasReady()
-    {
-        await JSRuntime.InvokeVoidAsync("onCanvasReady");
-    }
-
+   
 
     [JSInvokable]
-    public static void RenderMapFromJsonString(string jsonStr)
+    public static void RenderCanvasFromJsonString(string jsonStr)
     {
         JsonManager.Instance.Deserialize(jsonStr);
         SharedTimer.Instance.RedrawPending = true;
