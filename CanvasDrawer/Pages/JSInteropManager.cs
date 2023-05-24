@@ -5,7 +5,10 @@ using CanvasDrawer.Graphics;
 
 namespace CanvasDrawer.Pages {
     public sealed class JSInteropManager {
-        private readonly IJSRuntime _jsRuntime;
+
+		private static JSInteropManager? _instance;
+
+		private readonly IJSRuntime _jsRuntime;
         private readonly IJSInProcessRuntime _synchRT;
 
         public double CanvasWidth { get; private set; }
@@ -41,12 +44,21 @@ namespace CanvasDrawer.Pages {
             if (checkScale) {
                 CheckScale();
             }
+            _instance = this;
         }
 
-        /// <summary>
-        /// The window has been resized.
-        /// </summary>
-        public void WindowResized() {
+
+		/// <summary>
+		/// public access to the singleton
+		/// </summary>
+		public static JSInteropManager? Instance() {
+            return _instance;
+        }
+
+		/// <summary>
+		/// The window has been resized.
+		/// </summary>
+		public void WindowResized() {
             FixBlur();
             _offsetTopDirty = true;
             _offsetLeftDirty = true;

@@ -69,12 +69,12 @@ namespace CanvasDrawer.Graphics.Items {
         /// <param name="guid">The GUID to match.</param>
         /// <returns></returns>
         public Item FromGuid(string guid) {
-            Item item = GraphicsManager.Instance.NodeLayer.FromGuid(guid);
+            Item item = GraphicsManager.NodeLayer.FromGuid(guid);
             if (item == null) {
-                item = GraphicsManager.Instance.SubnetLayer.FromGuid(guid);
+                item = GraphicsManager.SubnetLayer.FromGuid(guid);
             }
             if (item == null) {
-                item = GraphicsManager.Instance.ConnectorLayer.FromGuid(guid);
+                item = GraphicsManager.ConnectorLayer.FromGuid(guid);
             }
 
             return item;
@@ -85,12 +85,11 @@ namespace CanvasDrawer.Graphics.Items {
         /// </summary>
         /// <returns>a list of all items on all layers.</returns>
         public static List<Item> GetAllItems() {
-            GraphicsManager gm = GraphicsManager.Instance;
             List<Item> items = new List<Item>();
-            items.AddRange(gm.ConnectorLayer.Items);
-            items.AddRange(gm.SubnetLayer.Items);
-            items.AddRange(gm.NodeLayer.Items);
-            items.AddRange(gm.AnnotationLayer.Items);
+            items.AddRange(GraphicsManager.ConnectorLayer.Items);
+            items.AddRange(GraphicsManager.SubnetLayer.Items);
+            items.AddRange(GraphicsManager.NodeLayer.Items);
+            items.AddRange(GraphicsManager.AnnotationLayer.Items);
             return items;
         }
 

@@ -132,9 +132,9 @@ namespace CanvasDrawer.Graphics.Selection {
             }
 
             List<Item> containedItems = new List<Item>();
-            GraphicsManager.Instance.NodeLayer.AddContainedItems(containedItems, r, true);
-            GraphicsManager.Instance.SubnetLayer.AddContainedItems(containedItems, r, true);
-            GraphicsManager.Instance.AnnotationLayer.AddContainedItems(containedItems, r, true);
+            GraphicsManager.NodeLayer.AddContainedItems(containedItems, r, true);
+            GraphicsManager.SubnetLayer.AddContainedItems(containedItems, r, true);
+            GraphicsManager.AnnotationLayer.AddContainedItems(containedItems, r, true);
 
             NotifyObservers();
             return containedItems;
@@ -165,7 +165,7 @@ namespace CanvasDrawer.Graphics.Selection {
 
             //reconnecting a connector?
             if (filter(EItemType.LineConnector)) {
-                connectorItem = GraphicsManager.Instance.ConnectorLayer.ItemAt(ue.X, ue.Y);
+                connectorItem = GraphicsManager.ConnectorLayer.ItemAt(ue.X, ue.Y);
 
                 if (connectorItem != null) {
                     connectorItem.SetResizeRectIndex(ue);
@@ -191,7 +191,7 @@ namespace CanvasDrawer.Graphics.Selection {
 
             //resizing a subnet?
             if ((subnetItem == null) && filter(EItemType.NodeBox)) {
-                subnetItem = GraphicsManager.Instance.SubnetLayer.ItemAt(ue.X, ue.Y);
+                subnetItem = GraphicsManager.SubnetLayer.ItemAt(ue.X, ue.Y);
                 if (subnetItem != null) {
                     subnetItem.SetResizeRectIndex(ue);
 
@@ -204,7 +204,7 @@ namespace CanvasDrawer.Graphics.Selection {
             Item hitItem = null;
 
             if ((hitItem == null) && (filter(EItemType.Node))) {
-                hitItem = GraphicsManager.Instance.NodeLayer.ItemAt(ue.X, ue.Y);
+                hitItem = GraphicsManager.NodeLayer.ItemAt(ue.X, ue.Y);
             }
 
            if ((hitItem == null) && filter(EItemType.NodeBox)) {
@@ -213,7 +213,7 @@ namespace CanvasDrawer.Graphics.Selection {
                     return subnetItem;
                 }
 
-                hitItem = GraphicsManager.Instance.SubnetLayer.ItemAt(ue.X, ue.Y);
+                hitItem = GraphicsManager.SubnetLayer.ItemAt(ue.X, ue.Y);
             }
 
 
@@ -223,11 +223,11 @@ namespace CanvasDrawer.Graphics.Selection {
                     return connectorItem;
                 }
 
-                hitItem = GraphicsManager.Instance.ConnectorLayer.ItemAt(ue.X, ue.Y);
+                hitItem = GraphicsManager.ConnectorLayer.ItemAt(ue.X, ue.Y);
             }
 
             if ((hitItem == null) && filter(EItemType.Annotation)) {
-                hitItem = GraphicsManager.Instance.AnnotationLayer.ItemAt(ue.X, ue.Y);
+                hitItem = GraphicsManager.AnnotationLayer.ItemAt(ue.X, ue.Y);
             }
 
             return hitItem;
@@ -240,10 +240,10 @@ namespace CanvasDrawer.Graphics.Selection {
         /// <returns>true if there are any selected items</returns>
         public bool AnySelectedItems(bool skipLocked) {
 
-            bool anySelected = GraphicsManager.Instance.AnnotationLayer.AnySelectedItems(skipLocked);
-            anySelected = anySelected || GraphicsManager.Instance.NodeLayer.AnySelectedItems(skipLocked);
-            anySelected = anySelected || GraphicsManager.Instance.SubnetLayer.AnySelectedItems(skipLocked);
-            anySelected = anySelected || GraphicsManager.Instance.ConnectorLayer.AnySelectedItems(skipLocked);
+            bool anySelected = GraphicsManager.AnnotationLayer.AnySelectedItems(skipLocked);
+            anySelected = anySelected || GraphicsManager.NodeLayer.AnySelectedItems(skipLocked);
+            anySelected = anySelected || GraphicsManager.SubnetLayer.AnySelectedItems(skipLocked);
+            anySelected = anySelected || GraphicsManager.ConnectorLayer.AnySelectedItems(skipLocked);
 
             return anySelected;
         }
@@ -252,10 +252,10 @@ namespace CanvasDrawer.Graphics.Selection {
         public List<Item> SelectedItems() {
             List<Item> list = new List<Item>();
 
-            GraphicsManager.Instance.SubnetLayer.AddSelectedItems(list);
-            GraphicsManager.Instance.NodeLayer.AddSelectedItems(list);
-            GraphicsManager.Instance.ConnectorLayer.AddSelectedItems(list);
-            GraphicsManager.Instance.AnnotationLayer.AddSelectedItems(list);
+            GraphicsManager.SubnetLayer.AddSelectedItems(list);
+            GraphicsManager.NodeLayer.AddSelectedItems(list);
+            GraphicsManager.ConnectorLayer.AddSelectedItems(list);
+            GraphicsManager.AnnotationLayer.AddSelectedItems(list);
             return list;
         }
 
@@ -263,7 +263,7 @@ namespace CanvasDrawer.Graphics.Selection {
         public List<Item> SelectedNodes() {
             List<Item> list = new List<Item>();
 
-            GraphicsManager.Instance.NodeLayer.AddSelectedItems(list);
+            GraphicsManager.NodeLayer.AddSelectedItems(list);
             return list;
         }
 
@@ -271,10 +271,10 @@ namespace CanvasDrawer.Graphics.Selection {
         /// Set all the items to unselected.
         /// </summary>
         public void UnselectAll() {
-            GraphicsManager.Instance.NodeLayer.UnselectAll();
-            GraphicsManager.Instance.SubnetLayer.UnselectAll();
-            GraphicsManager.Instance.AnnotationLayer.UnselectAll();
-            GraphicsManager.Instance.ConnectorLayer.UnselectAll();
+            GraphicsManager.NodeLayer.UnselectAll();
+            GraphicsManager.SubnetLayer.UnselectAll();
+            GraphicsManager.AnnotationLayer.UnselectAll();
+            GraphicsManager.ConnectorLayer.UnselectAll();
         }
 
         /// <summary>
@@ -282,10 +282,10 @@ namespace CanvasDrawer.Graphics.Selection {
         /// </summary>
         public void SelectAll() {
             if (DisplayManager.Instance.MapIsEditable()) {
-                GraphicsManager.Instance.NodeLayer.SelectAll();
-                GraphicsManager.Instance.SubnetLayer.SelectAll();
-                GraphicsManager.Instance.ConnectorLayer.SelectAll();
-                GraphicsManager.Instance.AnnotationLayer.SelectAll();
+                GraphicsManager.NodeLayer.SelectAll();
+                GraphicsManager.SubnetLayer.SelectAll();
+                GraphicsManager.ConnectorLayer.SelectAll();
+                GraphicsManager.AnnotationLayer.SelectAll();
                 GraphicsManager.Instance.ForceDraw();
             }
         }

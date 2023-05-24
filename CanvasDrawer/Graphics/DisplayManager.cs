@@ -9,11 +9,10 @@ using CanvasDrawer.Graphics.Editor;
 using CanvasDrawer.Util;
 
 namespace CanvasDrawer.Graphics {
-    public class DisplayManager {
+    public sealed class DisplayManager {
 
-        //use thread safe singleton pattern
-        private static DisplayManager _instance;
-        private static readonly object _padlock = new object();
+        private static DisplayManager? _instance;
+     
 
         //is the GUI overall editable or not?
         private bool _editable = true;
@@ -29,14 +28,15 @@ namespace CanvasDrawer.Graphics {
         /// </summary>
         public bool ShowGrid { get; set; } = true;
 
+        /// <summary>
+        /// public access to the singleton
+        /// </summary>
         public static DisplayManager Instance {
             get {
-                lock (_padlock) {
                     if (_instance == null) {
                         _instance = new DisplayManager();
                     }
                     return _instance;
-                }
             }
         }
 

@@ -671,7 +671,7 @@ namespace CanvasDrawer.Graphics.Items {
         public List<Item> GetAllConnected() {
             List<Item> list = new List<Item>();
 
-            List<Item> connectors = GraphicsManager.Instance.ConnectorLayer.Items;
+            List<Item> connectors = GraphicsManager.ConnectorLayer.Items;
 
             if (connectors != null) {
                 foreach (Item item in connectors) {

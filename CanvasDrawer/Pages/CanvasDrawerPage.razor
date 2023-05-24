@@ -323,7 +323,7 @@
         SharedTimer.Instance.RedrawPending = true;
     }
 
-    
+
 
     [JSInvokable]
     public static void UpdateTheme(string theme)
@@ -394,9 +394,10 @@
     [JSInvokable("WindowScrolled")]
     public static void WidowScrolled()
     {
-        if (GraphicsManager.Instance.PageManager != null)
+        JSInteropManager? jsmgr = JSInteropManager.Instance();
+        if (jsmgr != null)
         {
-            GraphicsManager.Instance.PageManager.WindowScrolled();
+            jsmgr.WindowScrolled();
         }
     }
 

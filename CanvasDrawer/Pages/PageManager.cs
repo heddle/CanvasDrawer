@@ -20,17 +20,17 @@ namespace CanvasDrawer.Pages {
     public sealed class PageManager : IDisposable {
 
         public delegate void PageChange(string page);
-        public PageChange PageChanger { get; set; }
+        public PageChange? PageChanger { get; set; }
 
         public delegate void MapCanvasHeight(string height);
-        public MapCanvasHeight MapCanvasHeightSet { get; set; }
+        public MapCanvasHeight? MapCanvasHeightSet { get; set; }
 
         //need to reset window size?
         private DoublePoint _windowSize = new DoublePoint(-1, -1);
 
         // delegate will be assigned to the refresher
         public delegate void PageRefresh();
-        public PageRefresh Refresher { get; set; }
+        public PageRefresh? Refresher { get; set; }
 
         //is the drawing dirty?
         public bool IsDirty { get; set; } = true;
@@ -71,7 +71,9 @@ namespace CanvasDrawer.Pages {
 
         //set the map canvas height pixels
         public void CanvasHeight(int height) {
-            MapCanvasHeightSet(height.ToString() + "px");
+            if (MapCanvasHeightSet != null) {
+                MapCanvasHeightSet(height.ToString() + "px");
+            }
         }
 
         public void WindowResized() {
@@ -101,16 +103,11 @@ namespace CanvasDrawer.Pages {
         }
 
 
-        //external set map frame resize
+        //external set frame resize
         public void SetMapFrameSize(int width, int height) {
             _windowSize.Set(width, height);
             JsManager.WindowResized();
             GraphicsManager.Instance.FullRefresh();
-        }
-
-        //the main window has been scrolled
-        public void WindowScrolled() {
-            JsManager.WindowScrolled();
         }
 
         //a simple alert message

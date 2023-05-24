@@ -28,7 +28,7 @@ namespace CanvasDrawer.Graphics.Items {
         /// Create a subnet from properties. This is done in JSon deserialization.
         /// </summary>
         /// <param name="properties">The properties from Json.</param>
-        public SubnetItem(Properties properties) : base(GraphicsManager.Instance.SubnetLayer, properties) {
+        public SubnetItem(Properties properties) : base(GraphicsManager.SubnetLayer, properties) {
             Properties = properties;
 
             //backwards compatibility, make sure it has a locked property
@@ -362,7 +362,7 @@ namespace CanvasDrawer.Graphics.Items {
         }
 
         public override void Delete() {
-            Layer nodeLayer = GraphicsManager.Instance.NodeLayer;
+            Layer nodeLayer = GraphicsManager.NodeLayer;
             foreach (Item item in nodeLayer.Items) {
                 NodeItem node = (NodeItem)item;
                 if (node.Subnet == this) {
@@ -440,7 +440,7 @@ namespace CanvasDrawer.Graphics.Items {
         public List<Item> GetAllContainedNodes() {
             List<Item> nodes = new List<Item>();
 
-            Layer nodeLayer = GraphicsManager.Instance.NodeLayer;
+            Layer nodeLayer = GraphicsManager.NodeLayer;
 
             foreach (Item item in nodeLayer.Items) {
 

@@ -32,7 +32,7 @@ namespace CanvasDrawer.Graphics.Items {
         /// Create a Node Item from properties, probably from Json deserialization.
         /// </summary>
         /// <param name="properties">The properties collection.</param>
-        public NodeItem(Properties properties) : base(GraphicsManager.Instance.NodeLayer, properties) {
+        public NodeItem(Properties properties) : base(GraphicsManager.NodeLayer, properties) {
             //must get the ICON before calling custom
             Icon = properties.GetValue(DefaultKeys.ICON_KEY);
 

@@ -74,7 +74,7 @@ namespace CanvasDrawer.Graphics.Connection
 		/// <param name="color">The new line color.</param>
 		public void ChangeColorOfSelectedConnectors(string color)
 		{
-			List<Item> cnxList = GraphicsManager.Instance.ConnectorLayer.Items;
+			List<Item> cnxList = GraphicsManager.ConnectorLayer.Items;
 
 			if (cnxList != null) {
 				foreach (Item item in cnxList) {
@@ -192,7 +192,7 @@ namespace CanvasDrawer.Graphics.Connection
 
 				switch (_connectionType) {
 					case EConnectionType.LINE:
-						LineConnectorItem cnx = new LineConnectorItem(GraphicsManager.Instance.ConnectorLayer, StartItem, EndItem);
+						LineConnectorItem cnx = new LineConnectorItem(GraphicsManager.ConnectorLayer, StartItem, EndItem);
 
 						if (StateMachine.Instance.CurrentState == EState.Reconnect && (_reconnectLineColor != null)) {
 							Property prop = cnx.Properties.GetProperty(DefaultKeys.FG_COLOR);
@@ -253,7 +253,7 @@ namespace CanvasDrawer.Graphics.Connection
 		/// <returns>ll the connections in the model.</returns>
 		public List<Item> GetAllConnections()
 		{
-			return GraphicsManager.Instance.ConnectorLayer.Items;
+			return GraphicsManager.ConnectorLayer.Items;
 		}
 
 		//an item has changed

@@ -46,14 +46,14 @@ namespace CanvasDrawer.Graphics {
         public Graphics2D G2D { get; set; }
 
         //the layers
-        public Layer ConnectorLayer { get; private set; } = new Layer("Connectors");
-        public Layer NodeLayer { get; private set; } = new Layer("Nodes");
-        public Layer SubnetLayer { get; private set; } = new Layer("Boxes");
-        public Layer AnnotationLayer { get; private set; } = new Layer("Annotations");
+        public static Layer ConnectorLayer { get; private set; } = new Layer("Connectors");
+        public static Layer NodeLayer { get; private set; } = new Layer("Nodes");
+        public static Layer SubnetLayer { get; private set; } = new Layer("Boxes");
+        public static Layer AnnotationLayer { get; private set; } = new Layer("Annotations");
 
 
     //array of all layers
-    private Layer[] _layers;
+    private Layer[] _layers = { ConnectorLayer, NodeLayer, SubnetLayer, AnnotationLayer };
 
         //the page manager
         public PageManager PageManager { get; set; }
@@ -372,19 +372,17 @@ namespace CanvasDrawer.Graphics {
                         return;
                     }
 
-
-                    ConfiningRect.Move(dx, dy);
+					ConfiningRect.Move(dx, dy);
                     if ((Math.Abs(dx) > 2) || ((Math.Abs(dy) > 2))) {
-                        foreach (Layer layer in GetAllLayers()) {
-                            layer.OffsetLayer(dx, dy);
-                            _lastEvent.Set(currentEvent);
-                        }
+						foreach (Layer layer in GetAllLayers()) {
+							layer.OffsetLayer(dx, dy);
+							_lastEvent.Set(currentEvent);
+						}
                     }
 
-                    PageManager.IsDirty = true;
-                    ForceDraw();
-
-                    break;
+					PageManager.IsDirty = true;
+					ForceDraw();
+					break;
 
                 default:
                     break;
@@ -767,14 +765,6 @@ namespace CanvasDrawer.Graphics {
 
         //get all the layers
         public Layer[] GetAllLayers() {
-            if (_layers == null) {
-                _layers = new Layer[5];
-                _layers[0] = ConnectorLayer;
-                _layers[1] = NodeLayer;
-                _layers[2] = SubnetLayer;
-                _layers[3] = AnnotationLayer;
-            }
-
             return _layers;
         }
     }

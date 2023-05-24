@@ -17,7 +17,7 @@ namespace CanvasDrawer.Graphics.Items {
         /// Create a TextItem from properties, most likely importing JSON.
         /// </summary>
         /// <param name="properties">The model properties.</param>
-        public TextItem(Properties properties) : base(GraphicsManager.Instance.AnnotationLayer, properties) {
+        public TextItem(Properties properties) : base(GraphicsManager.AnnotationLayer, properties) {
 
             //if name is there, remove it (backward compatibility)
             Property nameProp = properties.GetProperty(DefaultKeys.NAME_KEY);

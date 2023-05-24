@@ -79,7 +79,7 @@ namespace CanvasDrawer.Graphics.Cloning
 
 				if ((startItem != null) && (endItem != null)) {
 					if (connector.IsLineConnector()) {
-						LineConnectorItem line = new LineConnectorItem(GraphicsManager.Instance.ConnectorLayer, startItem, endItem);
+						LineConnectorItem line = new LineConnectorItem(GraphicsManager.ConnectorLayer, startItem, endItem);
 						line.SetForeground(connector.GetForeground());
 					}
 				}

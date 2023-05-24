@@ -26,7 +26,7 @@ namespace CanvasDrawer.Graphics.Items {
         /// Create a line connector from a Properties object. Probably Json deserialization.
         /// </summary>
         /// <param name="properties">the Properties object.</param>
-        public LineConnectorItem(Properties properties) : base(GraphicsManager.Instance.ConnectorLayer, properties) {
+        public LineConnectorItem(Properties properties) : base(GraphicsManager.ConnectorLayer, properties) {
             string startGuidStr = properties.GetValue(DefaultKeys.STARTGUID);
             string endGuidStr = properties.GetValue(DefaultKeys.ENDGUID);
 
