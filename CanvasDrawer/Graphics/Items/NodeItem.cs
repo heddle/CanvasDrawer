@@ -127,37 +127,39 @@ namespace CanvasDrawer.Graphics.Items {
 
             double y = GetBounds().Bottom() + fheight + fontslop;
 
-            PageManager pm = GraphicsManager.Instance.PageManager;
+            JSInteropManager jsm = JSInteropManager.Instance;
 
-            Property nameProp = Properties.GetProperty(DefaultKeys.NAME_KEY);
-            if ((nameProp != null) && nameProp.DisplayedOnCanvas) {
-                String s = TruncateString(nameProp.Value, true);
-                maxWidth = Math.Max(maxWidth, pm.TextWidth(s, g.FontFamily, g.FontSize));
-                y += fheight + fontslop;
-            }
-
-
-            if ((GraphicsManager.Instance.ZoomLevel() > -3) && (Properties != null)) {
-                foreach (Property prop in Properties) {
-                    if (prop.DisplayedOnCanvas && !prop.IsName()) {
-
-
-                        String displayStr = prop.Value;
-
-                        if (displayStr == null) {
-                            continue;
-                        }
-
-                        displayStr = displayStr.Trim();
-                        if (displayStr.Length < 1) {
-                            continue;
-                        }
-
-                        maxWidth = Math.Max(maxWidth, pm.TextWidth(displayStr, g.FontFamily, g.FontSize));
-                        y += fheight + fontslop;
-                    }  //displayed on map, but not name
+            if (jsm != null) {
+                Property nameProp = Properties.GetProperty(DefaultKeys.NAME_KEY);
+                if ((nameProp != null) && nameProp.DisplayedOnCanvas) {
+                    String s = TruncateString(nameProp.Value, true);
+                    maxWidth = Math.Max(maxWidth, jsm.TextWidth(s, g.FontFamily, g.FontSize));
+                    y += fheight + fontslop;
                 }
-            } // not zoomed in too much
+
+
+				if ((JSInteropManager.Instance != null) && (JSInteropManager.Instance.ZoomLevel > -3) && (Properties != null)) {
+                    foreach (Property prop in Properties) {
+                        if (prop.DisplayedOnCanvas && !prop.IsName()) {
+
+
+                            String displayStr = prop.Value;
+
+                            if (displayStr == null) {
+                                continue;
+                            }
+
+                            displayStr = displayStr.Trim();
+                            if (displayStr.Length < 1) {
+                                continue;
+                            }
+
+                            maxWidth = Math.Max(maxWidth, jsm.TextWidth(displayStr, g.FontFamily, g.FontSize));
+                            y += fheight + fontslop;
+                        }  //displayed on map, but not name
+                    }
+                } // not zoomed in too much
+            }
 
             totalBounds.Height = y - totalBounds.Y;
             totalBounds.X = xc - maxWidth / 2;

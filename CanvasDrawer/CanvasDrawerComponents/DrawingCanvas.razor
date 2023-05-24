@@ -163,10 +163,8 @@
         if (!_inited)
         {
 
-            System.Console.WriteLine("INITING DRAWING CANVAS");
-
             _jsManager = new JSInteropManager(JSRuntime, true);
-            _pageManager = new PageManager(_jsManager);
+            _pageManager = new PageManager();
 
             //assign the delegate that will call for redrawing of the page
             _pageManager.Refresher = Refresh;

@@ -10,6 +10,7 @@ using CanvasDrawer.Graphics.Theme;
 using System.Drawing;
 using CanvasDrawer.CanvasDrawerComponents;
 using System.Net.Http;
+using CanvasDrawer.Pages;
 
 namespace CanvasDrawer.Graphics.Items {
     public sealed class SubnetItem : RectItem {
@@ -157,13 +158,15 @@ namespace CanvasDrawer.Graphics.Items {
             gsave.DrawText(xc, y, displayStr);
 
             if (IsLocked()) {
-                double sw = GraphicsManager.Instance.PageManager.TextWidth(displayStr, gsave.FontFamily, gsave.FontSize);
 
-                if (ThemeManager.IsLight) {
-                    g.DrawImage(xc - sw / 2 - 13, y - fheight +4, 12, 12, "black_lock");
-                }
-                else {
-                    g.DrawImage(xc - sw / 2 - 13, y - fheight + 4, 12, 12, "white_lock");
+                if (JSInteropManager.Instance != null) {
+                    double sw = JSInteropManager.Instance.TextWidth(displayStr, gsave.FontFamily, gsave.FontSize);
+
+                    if (ThemeManager.IsLight) {
+                        g.DrawImage(xc - sw / 2 - 13, y - fheight + 4, 12, 12, "black_lock");
+                    } else {
+                        g.DrawImage(xc - sw / 2 - 13, y - fheight + 4, 12, 12, "white_lock");
+                    }
                 }
 
             }

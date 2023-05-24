@@ -75,7 +75,9 @@ namespace CanvasDrawer.Graphics {
                 SelectionManager.Instance.UnselectAll();
             }
 
-            JsManager().WindowResized();
+            if (JSInteropManager.Instance != null) {
+				JSInteropManager.Instance.WindowResized();
+            }
             GraphicsManager.Instance.FullRefresh();
         }
 
@@ -121,11 +123,6 @@ namespace CanvasDrawer.Graphics {
         /// <returns>true if the text item color palette should be displayed?</returns>
         public bool IsTextColorEditorVisible() {
             return MapIsEditable() && (TextColorEditor.Instance.GetHotItem() != null);
-        }
-
-        //convenience method
-        private JSInteropManager JsManager() {
-            return GraphicsManager.Instance.PageManager.JsManager;
         }
 
         //Toggle the feedback debugging display

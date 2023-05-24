@@ -6,9 +6,7 @@ using CanvasDrawer.Graphics;
 namespace CanvasDrawer.Pages {
     public sealed class JSInteropManager {
 
-		private static JSInteropManager? _instance;
-
-		private readonly IJSRuntime _jsRuntime;
+	    private readonly IJSRuntime _jsRuntime;
         private readonly IJSInProcessRuntime _synchRT;
 
         public double CanvasWidth { get; private set; }
@@ -17,15 +15,17 @@ namespace CanvasDrawer.Pages {
         public double CssHeight { get; set; }
         public bool ScaleDirty { get; set; } = true;
 
-        // dots per inch
-        public double DPI { get; set; } = -1;
+        public static JSInteropManager? Instance { get; set; }
+
+		// dots per inch
+		public double DPI { get; set; } = -1;
 
         //zoom related
         public int ZoomLevel { get; set; } = 1;
         private readonly double _zoomFactor = 1.25;
 
 
-        public DoublePoint Scale { get; set; } = null;
+        public DoublePoint? Scale { get; set; }
         private double _baseScaleX;
         private double _baseScaleY;
 
@@ -44,15 +44,7 @@ namespace CanvasDrawer.Pages {
             if (checkScale) {
                 CheckScale();
             }
-            _instance = this;
-        }
-
-
-		/// <summary>
-		/// public access to the singleton
-		/// </summary>
-		public static JSInteropManager? Instance() {
-            return _instance;
+            Instance = this;
         }
 
 		/// <summary>
@@ -219,6 +211,10 @@ namespace CanvasDrawer.Pages {
             return _synchRT.Invoke<string>("canvasDrawer.confirm", prompt);
         }
 
+        /// <summary>
+        /// A simple alert message
+        /// </summary>
+        /// <param name="message">The alert message</param>
         public void Alert(String message) {
             _synchRT.Invoke<string>("canvasDrawer.alert", message);
         }
@@ -328,7 +324,7 @@ namespace CanvasDrawer.Pages {
         }
 
         //example of font  "30px Arial"
-        public void DrawText(PageManager pm, double x, double y, string text, int size, string family, string color, string align) {
+        public void DrawText(double x, double y, string text, int size, string family, string color, string align) {
 
             CheckScale();
 
@@ -367,7 +363,10 @@ namespace CanvasDrawer.Pages {
 
             CheckScale();
 
-            if (!CheckDouble(Scale.X) || !CheckDouble(Scale.Y)) {
+			if (Scale == null) {
+				return;
+			}
+			if (!CheckDouble(Scale.X) || !CheckDouble(Scale.Y)) {
                 return;
             }
 
@@ -388,7 +387,10 @@ namespace CanvasDrawer.Pages {
 
             CheckScale();
 
-            if (!CheckDouble(Scale.X) || !CheckDouble(Scale.Y)) {
+			if (Scale == null) {
+				return;
+			}
+			if (!CheckDouble(Scale.X) || !CheckDouble(Scale.Y)) {
                 return;
             }
 
@@ -396,7 +398,7 @@ namespace CanvasDrawer.Pages {
                 Scale.X * w, Scale.Y * h, angle, imageId);
         }
 
-        public void DrawLine(PageManager pm, double x1, double y1, double x2, double y2, string color, double lineWidth, double dashLength) {
+        public void DrawLine(double x1, double y1, double x2, double y2, string color, double lineWidth = 0, double dashLength = 0) {
             CheckScale();
             double avgScale = (Scale.X + Scale.Y) / 2.0;
 
@@ -417,14 +419,17 @@ namespace CanvasDrawer.Pages {
         public void DrawEllipse(double xc, double yc, double radx, double rady,
             string fillColor, string borderColor, double lineWidth = 0) {
             CheckScale();
-            double avgScale = (Scale.X + Scale.Y) / 2.0;
+
+			if (Scale == null) {
+				return;
+			}
+			double avgScale = (Scale.X + Scale.Y) / 2.0;
             _ = _synchRT.Invoke<string>("canvasDrawer.drawEllipse", Scale.X * xc, Scale.Y * yc, Scale.X * radx, Scale.Y * rady, fillColor, borderColor, avgScale * lineWidth);
-        }
+		}
 
         /// <summary>
         /// Draw a rectangle.
         /// </summary>
-        /// <param name="pm"></param>
         /// <param name="left"></param>
         /// <param name="top"></param>
         /// <param name="width"></param>
@@ -433,21 +438,37 @@ namespace CanvasDrawer.Pages {
         /// <param name="borderColor"></param>
         /// <param name="lineWidth"></param>
         /// <param name="dashLength"></param>
-        public void DrawRectangle(PageManager pm, double left, double top, double width, double height,
-            string fillColor, string borderColor, double lineWidth, double dashLength) {
+        public void DrawRectangle(double left, double top, double width, double height,
+            string fillColor, string borderColor, double lineWidth = 0, double dashLength = 0) {
 
             CheckScale();
+
+            if (Scale == null) {
+                return;
+            }
             double avgScale = (Scale.X + Scale.Y) / 2.0;
            _ = _synchRT.Invoke<string>("canvasDrawer.fillRectangle", Scale.X * left, Scale.Y * top, Scale.X * width, Scale.Y * height, fillColor, borderColor, avgScale * lineWidth, avgScale * dashLength);
 
         }
 
-
         /// <summary>
-        /// Get the rectangle bounded by the map scroll bars.
+        /// 
         /// </summary>
-        /// <returns>the rectangle bounded by the map scroll bars.</returns>
-        public Rect CanvasScrollBoundaryRect() {
+        /// <param name="r"></param>
+        /// <param name="fillColor"></param>
+        /// <param name="borderColor"></param>
+        /// <param name="lineWidth"></param>
+        /// <param name="dashLength"></param>
+        public void DrawRectangle(Rect r, string fillColor, string borderColor,
+            double lineWidth = 0, double dashLength = 0) {
+            DrawRectangle(r.X, r.Y, r.Width, r.Height, fillColor, borderColor, lineWidth, dashLength);
+        }
+
+			/// <summary>
+			/// Get the rectangle bounded by the map scroll bars.
+			/// </summary>
+			/// <returns>the rectangle bounded by the map scroll bars.</returns>
+			public Rect CanvasScrollBoundaryRect() {
             Rect r = ClientBoundingRect("dcboundary");
             r.Move(-GetCanvasOffsetLeft(), -GetCanvasOffsetTop());
             return r;

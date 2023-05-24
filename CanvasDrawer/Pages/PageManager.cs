@@ -35,16 +35,12 @@ namespace CanvasDrawer.Pages {
         //is the drawing dirty?
         public bool IsDirty { get; set; } = true;
 
-        //makes the primative calls to javascript
-        public JSInteropManager JsManager;
-
         /// <summary>
         /// Reuse as the current mouse event.
         /// </summary>
         private UserEvent currentEvent = new UserEvent();
 
-        public PageManager(JSInteropManager jsManager) {
-            JsManager = jsManager;
+        public PageManager() {
 
             //wake up all managers
             GraphicsManager.Instance.PageManager = this;
@@ -77,9 +73,14 @@ namespace CanvasDrawer.Pages {
         }
 
         public void WindowResized() {
-            //redraw everything
-            IsDirty = true;
-            JsManager.WindowResized();
+			//redraw everything
+
+			JSInteropManager? jsm = JSInteropManager.Instance;
+			if (jsm == null) {
+				return;
+			}
+			IsDirty = true;
+            jsm.WindowResized();
             GraphicsManager.Instance.FullRefresh();
         }
 
@@ -89,15 +90,21 @@ namespace CanvasDrawer.Pages {
         /// is a little bigger.
         /// </summary>
         /// <returns></returns>
-        public Rect VisualRect() {
-            Rect r = JsManager.CanvasScrollBoundaryRect();
+        public Rect? VisualRect() {
 
-            JsManager.CheckScale();
+            JSInteropManager? jsm = JSInteropManager.Instance;
+            if ((jsm == null) || (jsm.Scale == null)) {
+                return null;
+            }
 
-            r.X /= JsManager.Scale.X;
-            r.Y /= JsManager.Scale.Y;
-            r.Width /= JsManager.Scale.X;
-            r.Height /= JsManager.Scale.Y;
+            Rect r = jsm.CanvasScrollBoundaryRect();
+
+            jsm.CheckScale();
+
+            r.X /= jsm.Scale.X;
+            r.Y /= jsm.Scale.Y;
+            r.Width /= jsm.Scale.X;
+            r.Height /= jsm.Scale.Y;
 
             return r;
         }
@@ -106,121 +113,23 @@ namespace CanvasDrawer.Pages {
         //external set frame resize
         public void SetMapFrameSize(int width, int height) {
             _windowSize.Set(width, height);
-            JsManager.WindowResized();
-            GraphicsManager.Instance.FullRefresh();
+
+            if (JSInteropManager.Instance != null) {
+				JSInteropManager.Instance.WindowResized();
+                GraphicsManager.Instance.FullRefresh();
+            }
         }
 
-        //a simple alert message
-        public void Alert(string message) {
-            JsManager.Alert(message);
-        }
-
-        /// <summary>
-        /// Copy the map to a background image.
-        /// Used for background drawing (e.g. rubberbanding)
-        /// </summary>
-        public void SaveCanvasInBackgoundImage() {
-            JsManager.SaveCanvasInBackgoundImage();
-        }
-
-        public double GetDPI() {
-            return JsManager.GetDPI();
-        }
-
-        /// <summary>
-        /// Restore the map from an offscreen background image.
-        /// The image is stored in the javascript.
-        /// </summary>
-        public void RestoreCanvasFromBackgroundImage() {
-            JsManager.RestoreCanvasFromBackgroundImage();
-        }
-
-        /// <summary>
-        /// Restore a rectangular area of the map from an offscreen background image.
-        /// </summary>
-        /// <param name="x">The left of the rectangular area.</param>
-        /// <param name="y">The top of the rectangular area.</param>
-        /// <param name="w">The width of the rectangular area.</param>
-        /// <param name="h">The height of the rectangular area.</param>
-        public void RestoreRectangularAreaFromBackgroundImage(double x, double y, double w, double h) {
-            JsManager.RestoreRectangularAreaFromBackgroundImage(x, y, w, h);
-        }
-
-        //draw text on the map
-        public void DrawText(double x, double y, string text, int size, string family, string color, string align) {
-			JsManager.DrawText(this, x, y, text, size, family, color, align);
-        }
-
-        /// <summary>
-        /// Draw a simple, upright ellipse
-        /// </summary>
-        /// <param name="xc">The horizontal center.</param>
-        /// <param name="yc">The vertical center.</param>
-        /// <param name="radx">The horizontal radius.</param>
-        /// <param name="rady">The vertical radius.</param>
-        /// <param name="fillColor">The fill color.</param>
-        /// <param name="borderColor">The line color.</param>
-        /// <param name="lineWidth">The line width.</param>
-        public void DrawEllipse(double xc, double yc, double radx, double rady,
-            string fillColor, string borderColor, double lineWidth = 0) {
-            JsManager.DrawEllipse(xc, yc, radx, rady, fillColor, borderColor, lineWidth);
-        }
-
-        //angles are in radians
-        public void DrawArc(double x, double y, double rad,
-            double startAngle, double endAngle, string fillColor, string borderColor,
-            double lineWidth = 0, double dashLength = 0) {
-
-            JsManager.DrawArc(x, y, rad, startAngle, endAngle, fillColor, borderColor, lineWidth, dashLength);
-        }
-
-        //Draw a rectangle
-        public void DrawRect(double x, double y, double width, double height, string fillColor, string borderColor, double lineWidth = 0, double dashLength = 0) {
-            JsManager.DrawRectangle(this, x, y, width, height, fillColor, borderColor, lineWidth, dashLength);
-        }
-
-
-        //Draw a rectangle
-        public void DrawRect(Rect r, string fillColor, string borderColor,
-        double lineWidth = 0, double dashLength = 0) {
-            DrawRect(r.X, r.Y, r.Width, r.Height, fillColor, borderColor, lineWidth, dashLength);
-        }
-
-        /// <summary>
-        /// Draw an image
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="imageId"></param>
-        public void DrawImage(double x, double y, double width, double height, string imageId) {
-            JsManager.DrawImage(x, y, width, height, imageId);
-        }
-
-        /// <summary>
-        /// Draw a rotated image.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="angle">The angle in radians.</param>
-        /// <param name="imageId"></param>
-        public void DrawRotatedImage(double x, double y, double width, double height, double angle, string imageId) {
-            JsManager.DrawRotatedImage(x, y, width, height, angle, imageId);
-        }
-
-        //Draw a line
-        public void DrawLine(double x1, double y1, double x2, double y2, string lineColor,
-            double lineWidth = 0, double dashLength = 0) {
-            JsManager.DrawLine(this, x1, y1, x2, y2, lineColor, lineWidth, dashLength);
-        }
-
+        
+       
         private void ChangeZoomLevel(int del) {
-            JsManager.ZoomLevel += del;
-            JsManager.ScaleDirty = true;
-            JsManager.CheckScale();
+			JSInteropManager? jsm = JSInteropManager.Instance;
+			if (jsm == null) {
+				return;
+			}
+			jsm.ZoomLevel += del;
+            jsm.ScaleDirty = true;
+            jsm.CheckScale();
             IsDirty = true;
             Draw();
         }
@@ -235,15 +144,10 @@ namespace CanvasDrawer.Pages {
             ChangeZoomLevel(-1);
         }
 
-        //Get the current scale in each direction
-        public DoublePoint CurrentScale() {
-            return JsManager.Scale;
-        }
-
         //refresh, but only if dirty
         public void Draw() {
-            if (IsDirty) {
-                JsManager.Clear();
+            if (IsDirty && (JSInteropManager.Instance != null)) {
+                JSInteropManager.Instance.Clear();
                 GraphicsManager.Instance.DrawModel();
                 IsDirty = false;
             }
@@ -262,11 +166,15 @@ namespace CanvasDrawer.Pages {
 
         //get the rectangle corresponding to canvas
         //it includes what lies beyond the scroll bars
-        public Rect CanvasBounds() {
-            double x = JsManager.GetCanvasOffsetLeft();
-            double y = JsManager.GetCanvasOffsetTop();
-            double w = JsManager.CanvasWidth;
-            double h = JsManager.CanvasHeight;
+        public Rect? CanvasBounds() {
+			JSInteropManager? jsm = JSInteropManager.Instance;
+			if (jsm == null) {
+				return null;
+			}
+			double x = jsm.GetCanvasOffsetLeft();
+            double y = jsm.GetCanvasOffsetTop();
+            double w = jsm.CanvasWidth;
+            double h = jsm.CanvasHeight;
 
             DoublePoint p0 = new DoublePoint();
             DoublePoint p1 = new DoublePoint();
@@ -280,27 +188,31 @@ namespace CanvasDrawer.Pages {
 
         //convert the client coords to true local relative to corner of main canvas
         public void ClientToLocal(MouseEventArgs e) {
-            double offL = JsManager.GetCanvasOffsetLeft();
-            double offT = JsManager.GetCanvasOffsetTop();
 
-            e.ClientX = (e.ClientX - offL) / JsManager.ZoomFactor();
-            e.ClientY = (e.ClientY - offT) / JsManager.ZoomFactor();
+            JSInteropManager? jsm = JSInteropManager.Instance;
+            if (jsm == null) {
+                return;
+            }
+            double offL = jsm.GetCanvasOffsetLeft();
+            double offT = jsm.GetCanvasOffsetTop();
+
+            e.ClientX = (e.ClientX - offL) / jsm.ZoomFactor();
+            e.ClientY = (e.ClientY - offT) / jsm.ZoomFactor();
         }
 
 
         public void ClientToLocal(double x, double y, DoublePoint pp) {
-            double offL = JsManager.GetCanvasOffsetLeft();
-            double offT = JsManager.GetCanvasOffsetTop();
-            pp.X = (x - offL) / JsManager.ZoomFactor();
-            pp.Y = (y - offT) / JsManager.ZoomFactor();
+			JSInteropManager? jsm = JSInteropManager.Instance;
+			if (jsm == null) {
+				return;
+			}
+			double offL = jsm.GetCanvasOffsetLeft();
+            double offT = jsm.GetCanvasOffsetTop();
+            pp.X = (x - offL) / jsm.ZoomFactor();
+            pp.Y = (y - offT) / jsm.ZoomFactor();
         }
 
         void IDisposable.Dispose() {
-        }
-
-        //get the text width
-        public double TextWidth(string text, string fontFamily, int fontSize) {
-            return JsManager.TextWidth(text, fontFamily, fontSize);
         }
 
         //mouse event on the canvas (map)
@@ -338,25 +250,7 @@ namespace CanvasDrawer.Pages {
             return currentEvent;
         }
 
-        //put a string into local storage
-        public void LocalStoragePutString(string name, string value) {
-            JsManager.LocalStoragePutString(name, value);
-        }
-
-        //retrieve a string from local storage
-        public string LocalStorageGetString(string name) {
-            return JsManager.LocalStorageGetString(name);
-        }
-
-        //clear everything from local storage
-        public void localStorageClear() {
-            JsManager.localStorageClear();
-        }
-
-        //remove an item from local storage
-        public void LocalStorageRemoveString(string name) {
-            JsManager.LocalStorageRemoveString(name);
-        }
+       
 
     }
 }

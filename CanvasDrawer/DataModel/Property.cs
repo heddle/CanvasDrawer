@@ -30,7 +30,9 @@ namespace CanvasDrawer.DataModel
         public static readonly int EDITABLE = 02;
         public static readonly int FEEDBACKABLE = 04;
         public static readonly int SHOWINEDITOR = 010;
-        public static readonly int NOTDISPLAYABLE = 020;
+
+
+        public static readonly int NOTDISPLAYABLE = 1000;
 
 
 

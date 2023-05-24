@@ -118,7 +118,9 @@ namespace CanvasDrawer.Graphics.Connection
 		public void InitConnection(EConnectionType etype)
 		{
 			_connectionType = etype;
-			PageManager.SaveCanvasInBackgoundImage();
+			if (JSInteropManager.Instance != null) {
+				JSInteropManager.Instance.SaveCanvasInBackgoundImage();
+			}
 		}
 
 		/// <summary>
@@ -133,12 +135,17 @@ namespace CanvasDrawer.Graphics.Connection
 				//restore the old
 				DoublePoint foc = StartItem.GetFocus();
 				Rect r = new Rect(foc, _prevPoint);
-				//         PageManager.RestoreRectangularAreaFromBackgroundImage(r.X, r.Y, r.Width, r.Height);
-				PageManager.RestoreCanvasFromBackgroundImage();
+
+				JSInteropManager? jsm = JSInteropManager.Instance;
+				if (jsm == null) {
+					return;
+				}
+				jsm.RestoreCanvasFromBackgroundImage();
+
 				//draw the new
 
 				if (ConnectorMenu.Instance.CurrentSelection == ConnectorMenu.LINECNX) {
-					PageManager.DrawLine(foc.X, foc.Y, ue.X, ue.Y, MAKECONNECTIONCOLOR, 2, 5);
+					jsm.DrawLine(foc.X, foc.Y, ue.X, ue.Y, MAKECONNECTIONCOLOR, 2, 5);
 				}
 				if (ConnectorMenu.Instance.CurrentSelection == ConnectorMenu.WANCNX) {
 					// lightening bolt
@@ -152,9 +159,9 @@ namespace CanvasDrawer.Graphics.Connection
 					double width = len;
 					double height = Math.Min(20, 10 * (len / 60));
 					if (len < 280) {
-						PageManager.DrawRotatedImage(xc, yc, width, height, angle, "boltSmall");
+						jsm.DrawRotatedImage(xc, yc, width, height, angle, "boltSmall");
 					} else {
-						PageManager.DrawRotatedImage(xc, yc, width, height, angle, "boltLarge");
+						jsm.DrawRotatedImage(xc, yc, width, height, angle, "boltLarge");
 					}
 				}
 

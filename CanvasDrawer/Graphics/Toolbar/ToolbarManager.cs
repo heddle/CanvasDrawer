@@ -115,7 +115,9 @@ namespace CanvasDrawer.Graphics.Toolbar {
                 SetButtonBackground(FromType(SelectedButton));
                 SetButtonBackground(FromType(EToolbarButton.POINTER));
                 SelectedButton = EToolbarButton.POINTER;
-                GraphicsManager.Instance.PageManager.JsManager.SetCursor("default");
+                if (JSInteropManager.Instance != null) {
+					JSInteropManager.Instance.SetCursor("default");
+                }
             }
         }
 

@@ -77,7 +77,7 @@ namespace CanvasDrawer.Graphics.Keyboard {
                 HandleModShiftF();  //for toggling feedback display
             }
             else if (mod && "z".Equals(key)) {
-                HandleModShiftZ();  //test map
+                HandleModShiftZ();  //test canvas
             }
 
         } //KeyDown

@@ -6,6 +6,7 @@ using CanvasDrawer.Util;
 using CanvasDrawer.DataModel;
 using CanvasDrawer.Graphics.Popup;
 using System.ComponentModel.DataAnnotations;
+using CanvasDrawer.Pages;
 
 namespace CanvasDrawer.Graphics.Items {
     public sealed class LineConnectorItem : ConnectorItem {
@@ -192,9 +193,15 @@ namespace CanvasDrawer.Graphics.Items {
                 return Double.PositiveInfinity;
             }
 
-            DoublePoint scaledp = GraphicsManager.Instance.PageManager.CurrentScale();
-            double scale = (scaledp.X + scaledp.Y) / 2;
-            return dist * scale;
+            if (JSInteropManager.Instance != null) {
+                DoublePoint? scaledp = JSInteropManager.Instance.Scale;
+
+                if (scaledp != null) {
+                    double scale = (scaledp.X + scaledp.Y) / 2;
+                    return dist * scale;
+                }
+            }
+            return Double.NaN;
         }
 
     }

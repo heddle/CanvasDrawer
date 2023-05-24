@@ -43,7 +43,10 @@ namespace CanvasDrawer.Util {
             //see if we need to update because of scrolling, etc.
             if (OffsetGrabPending) {
                 OffsetGrabPending = false;
-                GraphicsManager.Instance.PageManager.JsManager.SetOffsetsDirty();
+
+                if (JSInteropManager.Instance != null) {
+					JSInteropManager.Instance.SetOffsetsDirty();
+                }
             }
 
             //see if any redraws pending

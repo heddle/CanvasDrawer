@@ -49,8 +49,8 @@ namespace CanvasDrawer.Graphics.Feedback {
                 return;
             }
 
-            PageManager pm = GraphicsManager.Instance.PageManager;
-            JSInteropManager jsManager = pm.JsManager;
+   
+          
 
             _feedbackStrings.Clear();
             _feedbackStrings.Add("Use CTRL-SHIFT-F to hide");
@@ -58,27 +58,32 @@ namespace CanvasDrawer.Graphics.Feedback {
             _feedbackStrings.Add(String.Format("Map Mouse location: [{0:0.#}, {1:0.#}]", ue.X, ue.Y));
             _feedbackStrings.Add(String.Format("Page Mouse location: [{0:0.#}, {1:0.#}]", ue.Xpage, ue.Ypage));
 
-            //is the map dirty
+            //is the canvas dirty
             _feedbackStrings.Add(DirtyManager.Instance.ToString());
 
-            double cw = jsManager.CanvasWidth;
-            double ch = jsManager.CanvasHeight;
+			JSInteropManager? jsm = JSInteropManager.Instance;
+			if (jsm == null) {
+				return;
+			}
+
+			double cw = jsm.CanvasWidth;
+            double ch = jsm.CanvasHeight;
             _feedbackStrings.Add(String.Format("Canvas size: [{0:0.#}, {1:0.#}]", cw, ch));
 
 
-            double cssw = jsManager.CssWidth;
-            double cssh = jsManager.CssHeight;
+            double cssw = jsm.CssWidth;
+            double cssh = jsm.CssHeight;
             _feedbackStrings.Add(String.Format("CSS size: [{0:0.#}, {1:0.#}]", cssw, cssh));
 
-            double dpi = jsManager.GetDPI();
-            double ez = jsManager.ZoomLevel;
+            double dpi = jsm.GetDPI();
+            double ez = jsm.ZoomLevel;
             _feedbackStrings.Add("DPI: " + dpi + "  Zoom level: " + ez);
 
-            double jOffLeft = jsManager.GetCanvasOffsetLeft();
-            double jOffTop = jsManager.GetCanvasOffsetTop();
+            double jOffLeft = jsm.GetCanvasOffsetLeft();
+            double jOffTop = jsm.GetCanvasOffsetTop();
             _feedbackStrings.Add(String.Format("Canvas Offset: [{0:0.#}, {1:0.#}]", jOffLeft, jOffTop));
 
-            _feedbackStrings.Add(jsManager.ToString());
+            _feedbackStrings.Add(jsm.ToString());
 
             Item item = SelectionManager.Instance.ItemAtEvent(ue);
             if (item != null) {

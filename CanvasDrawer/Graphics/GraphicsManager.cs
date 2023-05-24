@@ -206,29 +206,38 @@ namespace CanvasDrawer.Graphics {
         /// </summary>
         /// <param name="g"></param>
         private void DrawGrid(Graphics2D g) {
-            double del = 96 * PageManager.GetDPI() / 2.54;
-            Rect r = PageManager.CanvasBounds();
 
-            g.LineColor = ThemeManager.CanvasGridColor;
-            g.LineStyle = ELineStyle.SOLID;
-            g.LineWidth = 0;
+            if (JSInteropManager.Instance != null) {
 
-            DoublePoint scale = PageManager.CurrentScale();
-            double delx = del / scale.X;
-            double dely = del / scale.Y;
+                double del = 96 * JSInteropManager.Instance.GetDPI() / 2.54;
+                Rect r = PageManager.CanvasBounds();
 
-            int nrow = (int)Math.Ceiling(r.Height / dely);
+                g.LineColor = ThemeManager.CanvasGridColor;
+                g.LineStyle = ELineStyle.SOLID;
+                g.LineWidth = 0;
 
-            for (int row = 1; row <= nrow; row++) {
-                double y = r.Y + dely * row;
-                g.DrawLine(r.X, y, r.Right(), y);
-            }
+                if (JSInteropManager.Instance != null) {
+                    DoublePoint? scale = JSInteropManager.Instance.Scale;
 
-            int ncol = (int)Math.Ceiling(r.Width / delx);
+                    if (scale != null) {
+                        double delx = del / scale.X;
+                        double dely = del / scale.Y;
 
-            for (int col = 1; col <= ncol; col++) {
-                double x = r.X + delx * col;
-                g.DrawLine(x, r.Y, x, r.Bottom());
+                        int nrow = (int)Math.Ceiling(r.Height / dely);
+
+                        for (int row = 1; row <= nrow; row++) {
+                            double y = r.Y + dely * row;
+                            g.DrawLine(r.X, y, r.Right(), y);
+                        }
+
+                        int ncol = (int)Math.Ceiling(r.Width / delx);
+
+                        for (int col = 1; col <= ncol; col++) {
+                            double x = r.X + delx * col;
+                            g.DrawLine(x, r.Y, x, r.Bottom());
+                        }
+                    }
+                }
             }
         }
 
@@ -338,16 +347,16 @@ namespace CanvasDrawer.Graphics {
                     DragManager.Instance.UpdateDragging(currentEvent);
                     ForceDraw();
                     SharedTimer.Instance.RedrawPending = true;
-                    break;
+					break;
 
                 case EState.Reshape:
-                    ReshapeManager.Instance.UpdateReshape(currentEvent);
-                    Refresh();
-                    break;
+					ReshapeManager.Instance.UpdateReshape(currentEvent);
+					Refresh();
+					break;
 
                 case EState.Banding:
-                    RubberbandManager.Instance.UpdateRubberbanding(currentEvent);
-                    break;
+					RubberbandManager.Instance.UpdateRubberbanding(currentEvent);
+					break;
 
                 case EState.Connect:
                 case EState.Reconnect:
@@ -356,32 +365,36 @@ namespace CanvasDrawer.Graphics {
 
                 case EState.Pan:
 
-                    double dx = (currentEvent.X - _lastEvent.X);
-                    double dy = (currentEvent.Y - _lastEvent.Y);
+					JSInteropManager? jsm = JSInteropManager.Instance;
+                    if (jsm != null) {
 
-                    double cw = PageManager.JsManager.CanvasWidth;
-                    double ch = PageManager.JsManager.CanvasHeight;
+                        double dx = (currentEvent.X - _lastEvent.X);
+                        double dy = (currentEvent.Y - _lastEvent.Y);
 
-                    //don't pan off canvas limits
-                    if (((ConfiningRect.X + dx) < 0) || ((ConfiningRect.Right() + dx) > cw)) { 
-                        _lastEvent.Set(currentEvent);
-                        return;
+                        double cw = jsm.CanvasWidth;
+                        double ch = jsm.CanvasHeight;
+
+                        //don't pan off canvas limits
+                        if (((ConfiningRect.X + dx) < 0) || ((ConfiningRect.Right() + dx) > cw)) {
+                            _lastEvent.Set(currentEvent);
+                            return;
+                        }
+                        if (((ConfiningRect.Y + dy) < 0) || ((ConfiningRect.Bottom() + dy) > ch)) {
+                            _lastEvent.Set(currentEvent);
+                            return;
+                        }
+
+                        ConfiningRect.Move(dx, dy);
+                        if ((Math.Abs(dx) > 2) || ((Math.Abs(dy) > 2))) {
+                            foreach (Layer layer in GetAllLayers()) {
+                                layer.OffsetLayer(dx, dy);
+                                _lastEvent.Set(currentEvent);
+                            }
+                        }
+
+                        PageManager.IsDirty = true;
+                        ForceDraw();
                     }
-                    if (((ConfiningRect.Y + dy) < 0) || ((ConfiningRect.Bottom() + dy) > ch)) {
-                        _lastEvent.Set(currentEvent);
-                        return;
-                    }
-
-					ConfiningRect.Move(dx, dy);
-                    if ((Math.Abs(dx) > 2) || ((Math.Abs(dy) > 2))) {
-						foreach (Layer layer in GetAllLayers()) {
-							layer.OffsetLayer(dx, dy);
-							_lastEvent.Set(currentEvent);
-						}
-                    }
-
-					PageManager.IsDirty = true;
-					ForceDraw();
 					break;
 
                 default:
@@ -459,7 +472,10 @@ namespace CanvasDrawer.Graphics {
                         else {
                             //cannot connect to self
                             if (item == ConnectionManager.Instance.StartItem) {
-                                PageManager.Alert("Cannot connect an item to itself.");
+
+                                if (JSInteropManager.Instance != null) {
+                                    JSInteropManager.Instance.Alert("Cannot connect an item to itself.");
+                                }
                                 ConnectionManager.Instance.Reset();
                                 RestoreDefault();
                             }
@@ -688,13 +704,11 @@ namespace CanvasDrawer.Graphics {
         }
 
         //Get the current scale in each direction
-        public DoublePoint CurrentScale() {
-            return PageManager.CurrentScale();
-        }
-
-        //convenience method to get zoom level
-        public int ZoomLevel() {
-            return PageManager.JsManager.ZoomLevel;
+        public DoublePoint? CurrentScale() {
+            if (JSInteropManager.Instance != null) {
+                return JSInteropManager.Instance.Scale;
+            }
+            return null;
         }
 
         //convenience method set selected button to pointer 
@@ -743,9 +757,14 @@ namespace CanvasDrawer.Graphics {
             TextColorEditor.Instance.Refresher();
             ToolbarManager.Instance.RefresherTools();
             ToolbarManager.Instance.RefresherNodes();
-            CanvasRefresher();
-                      PageManager.JsManager.SetOffsetsDirty();
-            PageManager.JsManager.FixBlur();
+
+			CanvasRefresher();
+
+			JSInteropManager? jsm = JSInteropManager.Instance;
+            if (jsm != null) {
+                jsm.SetOffsetsDirty();
+                jsm.FixBlur();
+            }
             ForceDraw();
         }
 

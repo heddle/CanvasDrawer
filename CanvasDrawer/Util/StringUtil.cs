@@ -25,8 +25,10 @@ namespace CanvasDrawer.Util
         /// <returns>The width in pixels.</returns>
         public static double TextWidth(string text, string fontFamily, int fontSize)
         {
-            PageManager pmgr = GraphicsManager.Instance.PageManager;
-            return pmgr.TextWidth(text, fontFamily, fontSize);
+            if (JSInteropManager.Instance != null) {
+                return JSInteropManager.Instance.TextWidth(text, fontFamily, fontSize);
+            }
+            return Double.NaN;
         }
 
         /// <summary>

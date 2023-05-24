@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using CanvasDrawer.Graphics.Selection;
 using CanvasDrawer.Graphics.Items;
+using CanvasDrawer.Pages;
 
 namespace CanvasDrawer.Graphics.Dragging {
     public sealed class DragManager {
 
 
         //use thread safe singleton pattern
-        private static DragManager _instance;
+        private static DragManager? _instance;
         private static readonly object _padlock = new object();
 
         private UserEvent _currentEvent;
@@ -33,11 +34,15 @@ namespace CanvasDrawer.Graphics.Dragging {
         }
 
         public void InitDragging(UserEvent ue) {
-            _currentEvent = new UserEvent(ue);
+			JSInteropManager? jsm = JSInteropManager.Instance;
+			if (jsm == null) {
+				return;
+			}
+			_currentEvent = new UserEvent(ue);
             _selectedItems = SelectionManager.Instance.SelectedItems();
             _confineRect = GraphicsManager.Confines();
-            _cw = GraphicsManager.Instance.PageManager.JsManager.CanvasWidth;
-            _ch = GraphicsManager.Instance.PageManager.JsManager.CanvasHeight;
+            _cw = jsm.CanvasWidth;
+            _ch = jsm.CanvasHeight;
 
         }
 

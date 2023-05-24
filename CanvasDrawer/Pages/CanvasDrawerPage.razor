@@ -394,7 +394,7 @@
     [JSInvokable("WindowScrolled")]
     public static void WidowScrolled()
     {
-        JSInteropManager? jsmgr = JSInteropManager.Instance();
+        JSInteropManager? jsmgr = JSInteropManager.Instance;
         if (jsmgr != null)
         {
             jsmgr.WindowScrolled();

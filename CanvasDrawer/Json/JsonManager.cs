@@ -117,8 +117,10 @@ namespace CanvasDrawer.Json {
         /// Desrialize a map from local storage.
         /// </summary>
         public void DeserializeFromLocalStorage() {
-            string jsonStr = GraphicsManager.Instance.PageManager.LocalStorageGetString(GraphicsManager.Instance.MapName);
-            Deserialize(jsonStr);
+            if (JSInteropManager.Instance != null) {
+                string jsonStr = JSInteropManager.Instance.LocalStorageGetString(GraphicsManager.Instance.MapName);
+                Deserialize(jsonStr);
+            }
         }
 
         
@@ -142,8 +144,10 @@ namespace CanvasDrawer.Json {
             jsonStr = JsonManager.Instance.Prettify(jsonStr);
 
             //put in local storage
-            string mapName = string.Copy(GraphicsManager.Instance.MapName);
-            GraphicsManager.Instance.PageManager.LocalStoragePutString(mapName, jsonStr);
+            if (JSInteropManager.Instance != null) {
+                string mapName = string.Copy(GraphicsManager.Instance.MapName);
+                JSInteropManager.Instance.LocalStoragePutString(mapName, jsonStr);
+            }
 
             return jsonStr;
         }

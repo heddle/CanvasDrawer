@@ -6,6 +6,7 @@ using CanvasDrawer.DataModel;
 using CanvasDrawer.Util;
 using CanvasDrawer.Graphics.Theme;
 using CanvasDrawer.Graphics.Editor;
+using CanvasDrawer.Pages;
 
 namespace CanvasDrawer.Graphics.Items {
     public abstract class RectItem : Item {
@@ -183,12 +184,16 @@ namespace CanvasDrawer.Graphics.Items {
             if (!IsSubnet()) {
                 Property nameProp = Properties.GetProperty(DefaultKeys.NAME_KEY);
 
-                if ((nameProp != null) && nameProp.DisplayedOnCanvas) {
+                Console.WriteLine("NAME: ");
+				Console.WriteLine("NAME: [" + nameProp.Value + "]");
+                Console.WriteLine("DISPLAYED: " + nameProp.DisplayedOnCanvas);
+
+				if ((nameProp != null) && nameProp.DisplayedOnCanvas && (nameProp.Value != null)) {
                     String s = TruncateString(nameProp.Value, true);
                     g.DrawText(xc, y, s);
 
-                    if (IsLocked()) {
-                        double sw = GraphicsManager.Instance.PageManager.TextWidth(s, g.FontFamily, g.FontSize);
+                    if (IsLocked() && (JSInteropManager.Instance != null)) {
+                        double sw = JSInteropManager.Instance.TextWidth(s, g.FontFamily, g.FontSize);
 
                         if (ThemeManager.IsLight) {
                             g.DrawImage(xc - sw/2 - 13, y-fheight+1, 12, 12, "black_lock");
@@ -203,7 +208,7 @@ namespace CanvasDrawer.Graphics.Items {
                 }
             }
 
-            if ((GraphicsManager.Instance.ZoomLevel() > -3) && (Properties != null)) {
+            if ((JSInteropManager.Instance != null) && (JSInteropManager.Instance.ZoomLevel > -3) && (Properties != null)) {
                 foreach (Property prop in Properties) {
                     if (prop.DisplayedOnCanvas && !prop.IsName()) {
 

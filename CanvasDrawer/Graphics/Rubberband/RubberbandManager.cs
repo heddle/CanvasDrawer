@@ -17,7 +17,7 @@ namespace CanvasDrawer.Graphics.Rubberband {
         private static RubberbandManager _instance;
         private static readonly object _padlock = new object();
 
-        private Rect rbRect;
+        private Rect? rbRect;
 
         //am i currently rubber banding?
         //the start of the rubber band
@@ -49,84 +49,97 @@ namespace CanvasDrawer.Graphics.Rubberband {
         /// <param name="mode">The mode, e.g. RECTANGLE, LINE, ELLIPSE, CLOUD</param>
         /// <param name="ue">The mouse event.</param>
         /// <param name="option"></param>
-        public void InitRubberbanding(ERubberbandMode mode, UserEvent ue, int option) {
-            _option = Math.Max(0, Math.Min(1, option));
-            _startEvent = new UserEvent(ue);
-            _mode = mode;
-            PageManager.SaveCanvasInBackgoundImage();
-            rbRect = null;
-            ClickCount = 0;
-        }
+        public void InitRubberbanding(ERubberbandMode mode, UserEvent ue, int option)
+		{
+			_option = Math.Max(0, Math.Min(1, option));
+			_startEvent = new UserEvent(ue);
+			_mode = mode;
 
-        /// <summary>
-        /// Update the rubberbanding.
-        /// </summary>
-        /// <param name="ue">The mouse event.</param>
-        public void UpdateRubberbanding(UserEvent ue) {
+			if (JSInteropManager.Instance != null) {
+				JSInteropManager.Instance.SaveCanvasInBackgoundImage();
+			}
+			rbRect = null;
+			ClickCount = 0;
+		}
 
-            if (StateMachine.Instance.CurrentState != EState.Banding) {
-                return;
-            }
+		/// <summary>
+		/// Update the rubberbanding.
+		/// </summary>
+		/// <param name="ue">The mouse event.</param>
+		public void UpdateRubberbanding(UserEvent ue) {
 
-             switch (_mode) {
-                case ERubberbandMode.RECTANGLEDRAG:
+			if (StateMachine.Instance.CurrentState != EState.Banding) {
+				return;
+			}
 
-                    double width = ue.X - _startEvent.X;
-                    double height = ue.Y - _startEvent.Y;
+			JSInteropManager? jsm = JSInteropManager.Instance;
+			if (jsm == null) {
+				return;
+			}
 
-                    if (rbRect == null) {
-                        rbRect = new Rect();
-                    }
-                    else {
-                        PageManager.RestoreRectangularAreaFromBackgroundImage(rbRect.X, rbRect.Y, rbRect.Width, rbRect.Height);
-                    }
-                    rbRect.Set(_startEvent.X - 2, _startEvent.Y - 2, width + 4, height + 4);
-                    PageManager.DrawRect(_startEvent.X, _startEvent.Y, width, height,
-                        TRANSCOLOR[_option], BORDCOLOR[_option], 1, 0);
-                    break;
 
-                case ERubberbandMode.ELLIPSE:
-                    width = ue.X - _startEvent.X;
-                    height = ue.Y - _startEvent.Y;
+			switch (_mode) {
+				case ERubberbandMode.RECTANGLEDRAG:
 
-                    if (rbRect == null) {
-                        rbRect = new Rect();
-                    }
-                    else {
-                        PageManager.RestoreRectangularAreaFromBackgroundImage(rbRect.X, rbRect.Y, rbRect.Width, rbRect.Height);
-                    }
-                    rbRect.Set(_startEvent.X - 2, _startEvent.Y - 2, width + 4, height + 4);
 
-                    PageManager.DrawEllipse(_startEvent.X + width / 2, _startEvent.Y + height / 2, width / 2, height / 2, TRANSCOLOR[_option], BORDCOLOR[_option], 1);
-                    break;
+					double width = ue.X - _startEvent.X;
+					double height = ue.Y - _startEvent.Y;
 
-                case ERubberbandMode.CLOUD:
+					if (rbRect == null) {
+						rbRect = new Rect();
+					} else {
+						jsm.RestoreRectangularAreaFromBackgroundImage(rbRect.X, rbRect.Y, rbRect.Width, rbRect.Height);
+					}
+					rbRect.Set(_startEvent.X - 2, _startEvent.Y - 2, width + 4, height + 4);
+					jsm.DrawRectangle(_startEvent.X, _startEvent.Y, width, height,
+						TRANSCOLOR[_option], BORDCOLOR[_option], 1, 0);
+					break;
 
-                    width = ue.X - _startEvent.X;
-                    height = ue.Y - _startEvent.Y;
+				case ERubberbandMode.ELLIPSE:
+					Console.WriteLine("   RB aaa");
+					width = ue.X - _startEvent.X;
+					height = ue.Y - _startEvent.Y;
 
-                    if (rbRect == null) {
-                        rbRect = new Rect();
-                    }
-                    else {
-                        PageManager.RestoreRectangularAreaFromBackgroundImage(rbRect.X, rbRect.Y, rbRect.Width, rbRect.Height);
-                    }
-                    rbRect.Set(_startEvent.X - 2, _startEvent.Y - 2, width + 4, height + 4);
-                    PageManager.DrawImage(_startEvent.X, _startEvent.Y, width, height, "cloud_Net");
-                    break;
+					if (rbRect == null) {
+						rbRect = new Rect();
+					} else {
+						jsm.RestoreRectangularAreaFromBackgroundImage(rbRect.X, rbRect.Y, rbRect.Width, rbRect.Height);
+					}
+					rbRect.Set(_startEvent.X - 2, _startEvent.Y - 2, width + 4, height + 4);
+					jsm.DrawEllipse(_startEvent.X + width / 2, _startEvent.Y + height / 2, Math.Abs(width / 2), Math.Abs(height / 2), TRANSCOLOR[_option], BORDCOLOR[_option], 1);
+					break;
 
-                case ERubberbandMode.LINE:
-                    break;
+				case ERubberbandMode.CLOUD:
 
-                default:
-                    break;
-            }
-        }
+					width = ue.X - _startEvent.X;
+					height = ue.Y - _startEvent.Y;
 
-        public UserEvent EndRubberbanding() {
-            PageManager.RestoreCanvasFromBackgroundImage();
-            return _startEvent;
-        }
+					if (rbRect == null) {
+						rbRect = new Rect();
+					} else {
+						JSInteropManager.Instance.RestoreRectangularAreaFromBackgroundImage(rbRect.X, rbRect.Y, rbRect.Width, rbRect.Height);
+					}
+					rbRect.Set(_startEvent.X - 2, _startEvent.Y - 2, width + 4, height + 4);
+					jsm.DrawImage(_startEvent.X, _startEvent.Y, width, height, "cloud_Net");
+					break;
+
+				case ERubberbandMode.LINE:
+					break;
+
+				default:
+					break;
+			}
+		}
+
+		public UserEvent EndRubberbanding()
+		{
+
+			if (JSInteropManager.Instance != null) {
+				JSInteropManager.Instance.RestoreCanvasFromBackgroundImage();
+			}
+
+			return _startEvent;
+		}
 
 
     }
