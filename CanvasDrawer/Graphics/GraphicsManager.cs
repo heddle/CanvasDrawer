@@ -295,7 +295,7 @@ namespace CanvasDrawer.Graphics {
                 TextItem textItem = new TextItem(AnnotationLayer, ue.X, ue.Y);
 
                 //auto bring up editor for new text item
-                if (DisplayManager.Instance.MapIsEditable() && !DisplayManager.Instance.IsPropertyEditorVisible()) {
+                if (!DisplayManager.Instance.IsPropertyEditorVisible()) {
                     DisplayManager.Instance.ToggleEditorDisplay();
                 }
 
@@ -417,9 +417,6 @@ namespace CanvasDrawer.Graphics {
                 //default pointer button
                 case EToolbarButton.POINTER:
 
-                    if (!DisplayManager.Instance.MapIsEditable()) {
-                        return;
-                    }
                     Item selectedItem = SelectionManager.Instance.UpdateSelection(currentEvent);
 
                     //if we haven't clicked on anything, rubberband for multiple select
@@ -774,12 +771,6 @@ namespace CanvasDrawer.Graphics {
             long lx = (long)(x + vs2);
             double dx = VirtualGridSize * (lx / VirtualGridSize);
             return dx;
-        }
-
-        //set the GUI editiable or not
-        //this is a simple redirect kept for backeards compatibility
-        public void SetEditable(bool editable) {
-            DisplayManager.Instance.SetEditable(editable);
         }
 
         //get all the layers

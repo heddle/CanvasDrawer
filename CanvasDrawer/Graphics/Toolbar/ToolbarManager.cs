@@ -286,10 +286,6 @@ namespace CanvasDrawer.Graphics.Toolbar {
                     GraphicsManager.Instance.HandleSnap();
                     RestoreDefault();
                     break;
-                case EToolbarButton.EDIT:
-                    DisplayManager.Instance.ToggleEditability();
-                    RestoreDefault();
-                    break;
                 case EToolbarButton.THEME:
                     ThemeManager.ToggleTheme();
                     RestoreDefault();

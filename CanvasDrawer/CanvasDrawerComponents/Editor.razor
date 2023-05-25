@@ -271,7 +271,7 @@
                 {
 
                     <tr>
-                        @if (GlobalEnabled() && @prop.IsLocked())
+                        @if (@prop.IsLocked())
                         {
 
                             <td>
@@ -289,7 +289,7 @@
                             </select>
                         }
 
-                        else if (GlobalEnabled() && CanEditTextFeatures() && @prop.IsFontSize())
+                        else if (CanEditTextFeatures() && @prop.IsFontSize())
                         {
                             <td>
                                 <label class="fscontainer">
@@ -312,7 +312,7 @@
                         else if (@prop.IsText())
                         {
 
-                            @if (GlobalEnabled() && @prop.Editable())
+                            @if (@prop.Editable())
                             {
 
                                 <td>
@@ -343,7 +343,7 @@
 
                                 @if (@prop.Editable() && !LockBlocked(prop))
                                 {
-                                    <td><input class="value" type="text" @onblur="FocusLost" @bind="@prop.Value" disabled="@GlobalDisabled()" /></td>
+                                    <td><input class="value" type="text" @onblur="FocusLost" @bind="@prop.Value" /></td>
                                 }
                                 else
                                 {
@@ -440,7 +440,7 @@
     //hide the add button?
     private bool HideAddButton()
     {
-        return (GlobalDisabled() || (_hotItem == null) || _hotItem.IsText() || _hotItem.IsLocked());
+        return ((_hotItem == null) || _hotItem.IsText() || _hotItem.IsLocked());
     }
 
     //Text area being edited
@@ -470,18 +470,6 @@
             }
         }
 
-    }
-
-    //is the map overall non-editable
-    private bool GlobalDisabled()
-    {
-        return !DisplayManager.Instance.MapIsEditable();
-    }
-
-    //is the map overall editable
-    private bool GlobalEnabled()
-    {
-        return !GlobalDisabled();
     }
 
     //background for text item text area widget
@@ -786,23 +774,7 @@
     //is the editor visible
     bool IsEditorVisible()
     {
-
-        if (DisplayManager.Instance.IsPropertyEditorVisible())
-        {
-            if (GlobalEnabled())
-            {
-                return true;
-            }
-            else
-            {
-                //in view only mode don't leave up if no item displyed
-                return (_hotItem != null);
-            }
-        }
-        else
-        {
-            return false;
-        }
+        return DisplayManager.Instance.IsPropertyEditorVisible();
     }
 
     //Should the component be hidded because the GUI

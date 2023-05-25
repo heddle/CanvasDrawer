@@ -72,13 +72,10 @@ namespace CanvasDrawer.Graphics.Selection {
         /// </summary>
         /// <param name="item">The item to select.</param>
 		public void SelectItem(Item item) {
-
-            if (DisplayManager.Instance.MapIsEditable()) {
-                if (item != null) {
-                    item.Selected = true;
-                    NotifyObservers();
-                }
-            }
+			if (item != null) {
+				item.Selected = true;
+				NotifyObservers();
+			}
 		}
 
         /// <summary>
@@ -281,14 +278,12 @@ namespace CanvasDrawer.Graphics.Selection {
         /// Set all the items to selected.
         /// </summary>
         public void SelectAll() {
-            if (DisplayManager.Instance.MapIsEditable()) {
-                GraphicsManager.NodeLayer.SelectAll();
-                GraphicsManager.SubnetLayer.SelectAll();
-                GraphicsManager.ConnectorLayer.SelectAll();
-                GraphicsManager.AnnotationLayer.SelectAll();
-                GraphicsManager.Instance.ForceDraw();
-            }
-        }
+			GraphicsManager.NodeLayer.SelectAll();
+			GraphicsManager.SubnetLayer.SelectAll();
+			GraphicsManager.ConnectorLayer.SelectAll();
+			GraphicsManager.AnnotationLayer.SelectAll();
+			GraphicsManager.Instance.ForceDraw();
+		}
 
     }
 }

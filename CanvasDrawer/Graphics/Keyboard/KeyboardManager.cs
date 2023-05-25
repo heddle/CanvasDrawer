@@ -62,13 +62,8 @@ namespace CanvasDrawer.Graphics.Keyboard {
             else if (mod && "u".Equals(key)) {
                 HandleModShiftU();  //for unlocking
             }
-
             else if (mod && "v".Equals(key)) {
                 HandleModShiftV();  //for deserializing
-            }
-
-            else if (mod && "e".Equals(key)) {
-                HandleModShiftE();  //for toggling enabled and disabled
             }
             else if (mod && "g".Equals(key)) {
                 HandleModShiftG();  //for toggling grid
@@ -88,10 +83,6 @@ namespace CanvasDrawer.Graphics.Keyboard {
             CloneManager.DuplicateSelectedItems();
         } //Control Shift D
 
-        //control shift E toggles enabled and disabled
-        private static void HandleModShiftE() {
-            DisplayManager.Instance.ToggleEditability();
-        }
 
         //control shift G toggles enabled and disabled
         private static void HandleModShiftG() {

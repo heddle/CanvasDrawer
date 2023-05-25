@@ -247,22 +247,11 @@
     }
 
 
-    //is the map editable
-    bool IsMapEditable()
-    {
-        return DisplayManager.Instance.MapIsEditable();
-    }
-
-    //Should the component be hidded because the GUI
-    //is not editable
-    bool IsToolbarHidden()
-    {
-        return !IsMapEditable();
-    }
+ 
 
     private String FirstRowHeight()
     {
-        return IsToolbarHidden() ? "4px" : "37px";
+        return "37px";
     }
 
     //initialization
@@ -333,12 +322,6 @@
         //    SharedTimer.CreateChangeTheme("dark", 3);
         //}
         //ThemeManager.UpdateTheme(theme);
-    }
-
-    [JSInvokable]
-    public static void SetEditable(bool isEditable)
-    {
-        GraphicsManager.Instance.SetEditable(isEditable);
     }
 
     [JSInvokable]

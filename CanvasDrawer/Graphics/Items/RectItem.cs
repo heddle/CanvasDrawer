@@ -184,10 +184,6 @@ namespace CanvasDrawer.Graphics.Items {
             if (!IsSubnet()) {
                 Property nameProp = Properties.GetProperty(DefaultKeys.NAME_KEY);
 
-                Console.WriteLine("NAME: ");
-				Console.WriteLine("NAME: [" + nameProp.Value + "]");
-                Console.WriteLine("DISPLAYED: " + nameProp.DisplayedOnCanvas);
-
 				if ((nameProp != null) && nameProp.DisplayedOnCanvas && (nameProp.Value != null)) {
                     String s = TruncateString(nameProp.Value, true);
                     g.DrawText(xc, y, s);

@@ -55,43 +55,40 @@ namespace CanvasDrawer.Graphics.Popup {
             ItemManager.Instance.Subscribe(this);
         }
 
-        /// <summary>
-        /// Get the appropriate set of popup labels
-        /// </summary>
-        /// <returns>the appropriate set of popup labels</returns>
-        public string[] GetPopupLabels() {
+		/// <summary>
+		/// Get the appropriate set of popup labels
+		/// </summary>
+		/// <returns>the appropriate set of popup labels</returns>
+		public string[] GetPopupLabels() {
 
-            if (_hotItem == null) {
-                return NoLabels;
-            }
+			if (_hotItem == null) {
+				return NoLabels;
+			}
 
-            if (DisplayManager.Instance.MapIsEditable()) {
-                if (_hotItem.IsLineConnector()) {
-                    return ConnectorPopupLabels;
-                }
-                else {
-                    if (_hotItem.IsLocked()) {
-                        return ViewOnlyPopupLabels;
-                    }
-                    else {
-                        if (_hotItem.IsText()) {
-                            return TextItemPopupLabels;
-                        }
-                        else {
-                            return EditingPopupLabels;
-                        }
-                    }
-                }
-            }
-            else {
-                return ViewOnlyPopupLabels;
-            }
-        }
 
-        /// <summary>
-        /// Public access to the singleton.
-        /// </summary>
-        public static PopupManager Instance {
+			if (_hotItem.IsLineConnector()) {
+				return ConnectorPopupLabels;
+			}
+			else {
+				if (_hotItem.IsLocked()) {
+					return ViewOnlyPopupLabels;
+				}
+				else {
+					if (_hotItem.IsText()) {
+						return TextItemPopupLabels;
+					}
+					else {
+						return EditingPopupLabels;
+					}
+				}
+
+			}
+		}
+
+		/// <summary>
+		/// Public access to the singleton.
+		/// </summary>
+		public static PopupManager Instance {
             get {
                 lock (_padlock) {
                     if (_instance == null) {

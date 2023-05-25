@@ -363,12 +363,13 @@
 
         if (firstRender)
         {
-      //      _inited = false;
+            _inited = false;
             ((IJSInProcessRuntime)JSRuntime).InvokeVoid("canvasDrawer.fixblur");
             InitOnce();
+            Console.WriteLine("DrawingCanvas.RAZOR");
             ((IJSInProcessRuntime)JSRuntime).InvokeVoid("canvasDrawer.disableRightClickContextMenu");
         }
-        //     InitOnce();
+        //    InitOnce();
 
         SharedTimer.Instance.RedrawPending = true;
     }

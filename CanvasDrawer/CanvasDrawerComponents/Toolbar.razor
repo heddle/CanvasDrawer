@@ -129,7 +129,6 @@
 
             <button id="connector"
                     title="create a connector"
-                    hidden="@IsHidden()"
                     @onclick="@(e => ButtonClick(e, "connector"))"
                     @onmousedown="@(e => MouseDown(e, "connector"))"
                     @onmouseover="@(e => MouseOver(e, "connector"))"
@@ -139,7 +138,6 @@
 
             <button id="subnet"
                     title="create a subnet container"
-                    hidden="@IsHidden()"
                     @onclick="@(e => ButtonClick(e, "subnet"))"
                     @onmousedown="@(e => MouseDown(e, "subnet"))"
                     @onmouseover="@(e => MouseOver(e, "subnet"))"
@@ -151,7 +149,6 @@
 
             <button id="text"
                     title="create a text box"
-                    hidden="@IsHidden()"
                     @onclick="@(e => ButtonClick(e, "text"))"
                     @onmouseover="@(e => MouseOver(e, "text"))"
                     @onmouseout="@(e => MouseOut(e, "text"))">
@@ -160,7 +157,6 @@
 
             <button id="snap"
                     title="snap items to the grid"
-                    hidden="@IsHidden()"
                     @onclick="@(e => ButtonClick(e, "snap"))"
                     @onmouseover="@(e => MouseOver(e, "snap"))"
                     @onmouseout="@(e => MouseOut(e, "snap"))">
@@ -169,7 +165,6 @@
 
             <button id="duplicateitems"
                     title="click to duplicate selected items"
-                    hidden="@IsHidden()"
                     @onclick="@(e => ButtonClick(e, "duplicateitems"))"
                     @onmouseover="@(e => MouseOver(e, "duplicateitems"))"
                     @onmouseout="@(e => MouseOut(e, "duplicateitems"))">
@@ -178,7 +173,6 @@
 
             <button id="deleteitems"
                     title="click to delete selected items"
-                    hidden="@IsHidden()"
                     @onclick="@(e => ButtonClick(e, "deleteitems"))"
                     @onmouseover="@(e => MouseOver(e, "deleteitems"))"
                     @onmouseout="@(e => MouseOut(e, "deleteitems"))">
@@ -186,14 +180,6 @@
             </button>
 
             <img src="images/transparent.png" width="32" height="32">
-
-            <button id="edit"
-                    title="toggle edit mode"
-                    @onclick="@(e => ButtonClick(e, "edit"))"
-                    @onmouseover="@(e => MouseOver(e, "edit"))"
-                    @onmouseout="@(e => MouseOut(e, "edit"))">
-                <img src="images/editMode.svg">
-            </button>
 
             <button id="theme"
                     title="toggle the theme from light to dark"
@@ -216,19 +202,6 @@
 
     //watch for initialization
     private static bool _inited = false;
-
-    //is the GUI editable
-    private bool IsEditable()
-    {
-        return DisplayManager.Instance.MapIsEditable();
-    }
-
-    //Should the component be hidded because the GUI
-    //is not editable
-    bool IsHidden()
-    {
-        return !IsEditable();
-    }
 
     //get the image file name for the current subnet shape
     private string ShapeImageFile()
@@ -302,6 +275,7 @@
             ToolbarManager.Instance.JsManager = _jsManager;
             ToolbarManager.Instance.SetAllBackgrounds();
             ToolbarManager.Instance.RefresherTools = Refresh;
+            Console.WriteLine("TOOLBAR.RAZOR");
             ((IJSInProcessRuntime)JSRuntime).InvokeVoid("canvasDrawer.disableRightClickContextMenuOnShapeButton");
             ((IJSInProcessRuntime)JSRuntime).InvokeVoid("canvasDrawer.disableRightClickContextMenuOnConnectorButton"); Refresh();
         }

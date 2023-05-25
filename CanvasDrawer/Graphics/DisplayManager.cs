@@ -13,10 +13,6 @@ namespace CanvasDrawer.Graphics {
 
         private static DisplayManager? _instance;
      
-
-        //is the GUI overall editable or not?
-        private bool _editable = true;
-
         //Is the property editor to be shown?
         private bool _showEditor = false;
 
@@ -47,13 +43,6 @@ namespace CanvasDrawer.Graphics {
         }
 
 
-        //Toggle the editability state of the entire
-        //map
-        public void ToggleEditability() {
-            SetEditable(!_editable);
-            SharedTimer.Instance.OffsetGrabPending = true;
-        }
-
         //force the editor to be visible
         public void SetEditorVisible() {
 
@@ -63,23 +52,7 @@ namespace CanvasDrawer.Graphics {
             }
         }
 
-        //set the GUI editiable or not
-        public void SetEditable(bool editable) {
-            if (_editable == editable) {
-                return;
-            }
 
-            _editable = editable;
-
-            if (!_editable) {
-                SelectionManager.Instance.UnselectAll();
-            }
-
-            if (JSInteropManager.Instance != null) {
-				JSInteropManager.Instance.WindowResized();
-            }
-            GraphicsManager.Instance.FullRefresh();
-        }
 
         //external hook to set map frame size
         public void SetMapFrameSize(int width, int height) {
@@ -92,14 +65,6 @@ namespace CanvasDrawer.Graphics {
             }
         }
 
-
-        /// <summary>
-        /// Is the GUI in an overall editable or view only state?
-        /// </summary>
-        /// <returns>true is GUI is in an editable state.</returns>
-        public bool MapIsEditable() {
-            return _editable;
-        }
 
         //Is the editor visible?
         public bool IsPropertyEditorVisible() {
@@ -114,7 +79,7 @@ namespace CanvasDrawer.Graphics {
         /// </summary>
         /// <returns>true if the connector color palette should be displayed?</returns>
         public bool IsPaletteEditorVisible() {
-            return MapIsEditable() && (PaletteEditor.Instance.GetHotItem() != null);
+            return PaletteEditor.Instance.GetHotItem() != null;
         }
 
         /// <summary>
@@ -122,7 +87,7 @@ namespace CanvasDrawer.Graphics {
         /// </summary>
         /// <returns>true if the text item color palette should be displayed?</returns>
         public bool IsTextColorEditorVisible() {
-            return MapIsEditable() && (TextColorEditor.Instance.GetHotItem() != null);
+            return TextColorEditor.Instance.GetHotItem() != null;
         }
 
         //Toggle the feedback debugging display

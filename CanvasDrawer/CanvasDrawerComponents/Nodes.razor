@@ -64,7 +64,7 @@
 
 <div class="noutdiv" tabindex="2" @onkeydown="KeyDown">
 
-    <div class="icon-group" hidden="@IsHidden()">
+    <div class="icon-group">
 
         <button id="webservice"
                 title="place a webservice"
@@ -174,17 +174,6 @@
 
     //watch for initialization
     private static bool _inited = false;
-
-    //is the GUI editable
-    bool IsEditable() {
-        return DisplayManager.Instance.MapIsEditable();
-    }
-
-    //Should the component be hidded because the GUI
-    //is not editable
-    bool IsHidden() {
-        return !IsEditable();
-    }
 
     //is this the light theme
     bool IsLight() {
