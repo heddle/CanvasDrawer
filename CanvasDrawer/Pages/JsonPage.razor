@@ -46,22 +46,22 @@
     }
 
     //initialization
-    private Task InitOnce() {
+    private void InitOnce() {
 
         if (!_inited) {
+            Console.WriteLine("INIT JSON Page");
             _inited = true;
             JsonManager.Instance.Refresher = Refresh;
         }
-        return Task.FromResult("done");
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender) {
+    protected override void OnAfterRender(bool firstRender) {
+        base.OnAfterRender(firstRender);
 
-        if (firstRender) {
-            _inited = false;
-            await InitOnce();
+        if (firstRender)
+        {
+            InitOnce();
         }
-        await InitOnce();
     }
 
     public void Refresh() {
