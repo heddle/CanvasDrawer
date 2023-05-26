@@ -95,7 +95,6 @@ namespace CanvasDrawer.Graphics.Rubberband {
 					break;
 
 				case ERubberbandMode.ELLIPSE:
-					Console.WriteLine("   RB aaa");
 					width = ue.X - _startEvent.X;
 					height = ue.Y - _startEvent.Y;
 

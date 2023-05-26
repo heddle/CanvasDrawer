@@ -171,10 +171,10 @@
     //initialization
     private Task InitOnce()
     {
-
         if (!_inited)
         {
-            _jsManager = new JSInteropManager(JSRuntime, false);
+            Console.WriteLine("INIT Popup");
+            _jsManager = JSInteropManager.getInstance(JSRuntime, false);
             _inited = true;
             PopupManager.Instance.Refresher = Refresh;
             Refresh();

@@ -269,13 +269,11 @@
 
         if (!_inited)
         {
-            _jsManager = new JSInteropManager(JSRuntime, false);
+            Console.WriteLine("INIT Toolbar");
+            _jsManager = JSInteropManager.getInstance(JSRuntime, false);
             _inited = true;
-            ThemeManager.JsManager = _jsManager;
-            ToolbarManager.Instance.JsManager = _jsManager;
             ToolbarManager.Instance.SetAllBackgrounds();
             ToolbarManager.Instance.RefresherTools = Refresh;
-            Console.WriteLine("TOOLBAR.RAZOR");
             ((IJSInProcessRuntime)JSRuntime).InvokeVoid("canvasDrawer.disableRightClickContextMenuOnShapeButton");
             ((IJSInProcessRuntime)JSRuntime).InvokeVoid("canvasDrawer.disableRightClickContextMenuOnConnectorButton"); Refresh();
         }

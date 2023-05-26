@@ -160,10 +160,11 @@
     {
 
 
+
         if (!_inited)
         {
-
-            _jsManager = new JSInteropManager(JSRuntime, true);
+            Console.WriteLine("INIT Drawing Canvas");
+            _jsManager = JSInteropManager.getInstance(JSRuntime, false);
             _pageManager = new PageManager();
 
             //assign the delegate that will call for redrawing of the page
@@ -366,7 +367,6 @@
             _inited = false;
             ((IJSInProcessRuntime)JSRuntime).InvokeVoid("canvasDrawer.fixblur");
             InitOnce();
-            Console.WriteLine("DrawingCanvas.RAZOR");
             ((IJSInProcessRuntime)JSRuntime).InvokeVoid("canvasDrawer.disableRightClickContextMenu");
         }
         //    InitOnce();

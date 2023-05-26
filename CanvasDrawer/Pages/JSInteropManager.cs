@@ -38,13 +38,20 @@ namespace CanvasDrawer.Pages {
         private bool _offsetTopDirty = true;
 
         //The gateway to the javascript
-        public JSInteropManager(IJSRuntime jsRuntime, bool checkScale) {
+        private JSInteropManager(IJSRuntime jsRuntime, bool checkScale) {
             _jsRuntime = jsRuntime;
             _synchRT = (IJSInProcessRuntime)_jsRuntime;
             if (checkScale) {
                 CheckScale();
             }
             Instance = this;
+        }
+
+        public static JSInteropManager getInstance(IJSRuntime jsRuntime, bool checkScale) {
+            if (Instance == null) {
+                Instance = new JSInteropManager(jsRuntime, checkScale);
+			}
+            return Instance;
         }
 
 		/// <summary>

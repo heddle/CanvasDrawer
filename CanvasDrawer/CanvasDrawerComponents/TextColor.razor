@@ -235,7 +235,8 @@
 
         if (!_inited)
         {
-            _jsManager = new JSInteropManager(JSRuntime, false);
+            Console.WriteLine("INIT TextColor");
+            _jsManager = JSInteropManager.getInstance(JSRuntime, false);
             _textColorEditor = TextColorEditor.Instance;
             _textColorEditor.SetHotItem = SetHotItem;
             _textColorEditor.Refresher = Refresh;

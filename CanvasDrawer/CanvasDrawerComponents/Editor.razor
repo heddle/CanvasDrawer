@@ -735,7 +735,8 @@
 
         if (!_inited)
         {
-            _jsManager = new JSInteropManager(JSRuntime, false);
+            Console.WriteLine("INIT Editor");
+            _jsManager = JSInteropManager.getInstance(JSRuntime, false);
             _propertyEditor = PropertyEditor.Instance;
             _propertyEditor.SetHotItem = SetHotItem;
             _propertyEditor.Refresher = Refresh;

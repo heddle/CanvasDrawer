@@ -110,8 +110,6 @@ namespace CanvasDrawer.Graphics.Theme {
         //selected button border
         public static string SelectedButtonBorder;
 
-        public static JSInteropManager JsManager { get; set; }
-
         //is the active theme the light theme
         public static bool IsLight { get; private set; } = false;
 
@@ -283,10 +281,15 @@ namespace CanvasDrawer.Graphics.Theme {
             }
 
             if (refresh) {
-                JsManager.ChangeBackground("maincanvas", CanvasColor);
-                JsManager.ChangeContainerBackground(ContainerColor);
-                JsManager.ChangeContainerBorderColor(ContainerBorderColor);
-                GraphicsManager.Instance.FullRefresh();
+
+                JSInteropManager? jsm = JSInteropManager.Instance;
+
+                if (jsm != null) {
+					jsm.ChangeBackground("maincanvas", CanvasColor);
+					jsm.ChangeContainerBackground(ContainerColor);
+					jsm.ChangeContainerBorderColor(ContainerBorderColor);
+                    GraphicsManager.Instance.FullRefresh();
+                }
             }
 
         }

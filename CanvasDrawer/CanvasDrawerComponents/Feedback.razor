@@ -59,9 +59,11 @@
     private Task InitOnce()
     {
 
+
         if (!_inited)
         {
-            _jsManager = new JSInteropManager(JSRuntime, false);
+            Console.WriteLine("INIT Feedback");
+            _jsManager = JSInteropManager.getInstance(JSRuntime, false);
             FeedbackManager.Instance.FeedbackUpdater = SetFeedbackText;
             FeedbackManager.Instance.Refresher = Refresh;
             _inited = true;

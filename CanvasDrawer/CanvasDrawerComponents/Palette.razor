@@ -231,9 +231,11 @@
     private Task InitOnce()
     {
 
+
         if (!_inited)
         {
-            _jsManager = new JSInteropManager(JSRuntime, false);
+            Console.WriteLine("INIT Palette");
+            _jsManager = JSInteropManager.getInstance(JSRuntime, false);
             _paletteEditor = PaletteEditor.Instance;
             _paletteEditor.SetHotItem = SetHotItem;
             _paletteEditor.Refresher = Refresh;

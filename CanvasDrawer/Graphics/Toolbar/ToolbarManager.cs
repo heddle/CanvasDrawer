@@ -21,7 +21,6 @@ namespace CanvasDrawer.Graphics.Toolbar {
         public delegate void Refresh();
         public Refresh RefresherNodes { get; set; }
         public Refresh RefresherTools { get; set; }
-        public JSInteropManager JsManager { get; set; }
 
         public PageManager PageManager { get; set; }
 
@@ -134,29 +133,34 @@ namespace CanvasDrawer.Graphics.Toolbar {
 
         public void SetButtonBackground(ToolbarButtonData data) {
 
-            if ((!data.Enabled)) {
-                JsManager.ChangeBackground(data.Id, ThemeManager.ButtonBackgrounds[ThemeManager.DISABLED]);
-                JsManager.ChangeBorder(data.Id, ThemeManager.ButtonBackgrounds[ThemeManager.DISABLED]);
-            }
-            else {
-                if (data.Selected) {
-                    string bg = data.IsTool ? ThemeManager.ButtonBackgrounds[ThemeManager.SELECTED_TOOL] : ThemeManager.ButtonBackgrounds[ThemeManager.SELECTED_NODE];
-                    JsManager.ChangeBackground(data.Id, bg);
-                    JsManager.ChangeBorder(data.Id, ThemeManager.SelectedButtonBorder);
+            JSInteropManager? jsm = JSInteropManager.Instance;
+            if (jsm != null) {
+
+
+                if ((!data.Enabled)) {
+					jsm.ChangeBackground(data.Id, ThemeManager.ButtonBackgrounds[ThemeManager.DISABLED]);
+					jsm.ChangeBorder(data.Id, ThemeManager.ButtonBackgrounds[ThemeManager.DISABLED]);
                 }
                 else {
-
-                    if (data.Id.Equals("deleteitems")) {
-                        JsManager.ChangeBackground(data.Id, ThemeManager.DeleteNormal);
-                        JsManager.ChangeBorder(data.Id, ThemeManager.DeleteNormal);
+                    if (data.Selected) {
+                        string bg = data.IsTool ? ThemeManager.ButtonBackgrounds[ThemeManager.SELECTED_TOOL] : ThemeManager.ButtonBackgrounds[ThemeManager.SELECTED_NODE];
+						jsm.ChangeBackground(data.Id, bg);
+						jsm.ChangeBorder(data.Id, ThemeManager.SelectedButtonBorder);
                     }
                     else {
-                        string bg = data.IsTool ? ThemeManager.ButtonBackgrounds[ThemeManager.BG_TOOL] : ThemeManager.ButtonBackgrounds[ThemeManager.BG_NODE];
-                        string bc = data.IsTool ? ThemeManager.ButtonBackgrounds[ThemeManager.BG_TOOL] : ThemeManager.DefaultButtonBorder;
-                        JsManager.ChangeBackground(data.Id, bg);
-                        JsManager.ChangeBorder(data.Id, bc);
-                    }
 
+                        if (data.Id.Equals("deleteitems")) {
+							jsm.ChangeBackground(data.Id, ThemeManager.DeleteNormal);
+							jsm.ChangeBorder(data.Id, ThemeManager.DeleteNormal);
+                        }
+                        else {
+                            string bg = data.IsTool ? ThemeManager.ButtonBackgrounds[ThemeManager.BG_TOOL] : ThemeManager.ButtonBackgrounds[ThemeManager.BG_NODE];
+                            string bc = data.IsTool ? ThemeManager.ButtonBackgrounds[ThemeManager.BG_TOOL] : ThemeManager.DefaultButtonBorder;
+							jsm.ChangeBackground(data.Id, bg);
+							jsm.ChangeBorder(data.Id, bc);
+                        }
+
+                    }
                 }
             }
         }

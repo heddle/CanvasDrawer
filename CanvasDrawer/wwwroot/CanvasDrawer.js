@@ -630,7 +630,6 @@ window.canvasDrawer = {
         var mainCan = document.getElementById("maincanvas");
         if (mainCan != null) {
 
-            console.log("DISABLING RIGHT CLICK")
             mainCan.addEventListener('contextmenu', function (e) {
                 if (e.button == 2) {
                     e.preventDefault();

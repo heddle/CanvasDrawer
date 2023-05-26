@@ -139,9 +139,12 @@
     private Task InitOnce()
     {
 
+
+
         if (!_inited)
         {
-            _jsManager = new JSInteropManager(JSRuntime, false);
+            Console.WriteLine("INIT ShapeChooser");
+            _jsManager = JSInteropManager.getInstance(JSRuntime, false);
             _inited = true;
             SubnetShapeMenu.Instance.Refresher = Refresh;
             Refresh();
