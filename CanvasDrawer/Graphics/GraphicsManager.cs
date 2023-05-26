@@ -28,9 +28,7 @@ namespace CanvasDrawer.Graphics {
         //for things like panning
         private UserEvent _lastEvent = new UserEvent();
 
-        //use thread safe singleton pattern
         private static GraphicsManager? _instance;
-        private static readonly object _padlock = new object();
 
         //the visual rect, used to check if something neets to be drawn
         public Rect VisualRect { get; set; }
@@ -65,13 +63,11 @@ namespace CanvasDrawer.Graphics {
         //public access to the singleton
         public static GraphicsManager Instance {
             get {
-                lock (_padlock) {
-                    if (_instance == null) {
-                        _instance = new GraphicsManager();
-                    }
-                    return _instance;
-                }
-            }
+				if (_instance == null) {
+					_instance = new GraphicsManager();
+				}
+				return _instance;
+			}
         }
 
         /// <summary>

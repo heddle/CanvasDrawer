@@ -33,15 +33,6 @@ namespace CanvasDrawer.Graphics.Items {
 
             Properties = properties;
 
-            //backward compatibility for when there was no lightening bolts
-
-            Property prop = Properties.GetProperty(DefaultKeys.CNXTYPE);
-            if (prop == null) {
-                prop = new Property(DefaultKeys.CNXTYPE, ConnectorMenu.LINECNX.ToString(), 0);
-                Properties.Add(prop);
-            }
-
-
             StartItem = ItemManager.Instance.FromGuid(startGuidStr);
             EndItem = ItemManager.Instance.FromGuid(endGuidStr);
 
@@ -55,9 +46,6 @@ namespace CanvasDrawer.Graphics.Items {
             base.CustomizeProperties();
             FeedbackableOnly(DefaultKeys.TYPE_KEY, EItemType.LineConnector.ToString());
             AllFeatures(DefaultKeys.NAME_KEY, EItemType.LineConnector.ToString());
-
-            //type is based on current selection
-            Hidden(DefaultKeys.CNXTYPE, ConnectorMenu.Instance.CurrentSelection.ToString());
         }
 
         /// <summary>
@@ -95,27 +83,8 @@ namespace CanvasDrawer.Graphics.Items {
 
             SetBounds(Start, End);
 
-            if (GetConnectorType() == ConnectorMenu.LINECNX) {
-                gsave.DrawLine(Start.X, Start.Y, End.X, End.Y);
-            }
-            else {
-                // lightening bolt
-                double delX = End.X - Start.X;
-                double delY = End.Y - Start.Y;
-                double len = Math.Sqrt(delX * delX + delY * delY);
-                len = Math.Max(60, len - 48);
-                double angle = Math.Atan2(delY, delX);
-                double xc = (End.X + Start.X) / 2;
-                double yc = (End.Y + Start.Y) / 2;
-                double width = len;
-                double height = Math.Min(20, 10 * (len / 60));
-                 if (len < 280) {
-                    gsave.DrawRotatedImage(xc, yc, width, height, angle, "boltSmall");
-                }
-                else {
-                    gsave.DrawRotatedImage(xc, yc, width, height, angle, "boltLarge");
-                }
-            }
+			gsave.DrawLine(Start.X, Start.Y, End.X, End.Y);
+
         }
 
         /// <summary>
@@ -141,19 +110,7 @@ namespace CanvasDrawer.Graphics.Items {
             return _bounds;
         }
 
-        /// <summary>
-        /// Get the shape of this line connector.
-        /// </summary>
-        /// <returns>The shape of the line connector.</returns>
-        public int GetConnectorType() {
-            Property prop = Properties.GetProperty(DefaultKeys.CNXTYPE);
-            if (prop == null) {
-                return ConnectorMenu.LINECNX;
-            }
-            else {
-                return Int32.Parse(prop.Value);
-            }
-        }
+       
 
         /// <summary>
         /// Get the resize rects.

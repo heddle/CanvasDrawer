@@ -13,9 +13,7 @@ using System.Transactions;
 namespace CanvasDrawer.Util {
     public class SharedTimer {
 
-        //use thread safe singleton pattern
-        private static SharedTimer _instance;
-        private static readonly object _padlock = new object();
+        private static SharedTimer? _instance;
 
         //The global timer
         public System.Timers.Timer Timer { get; }
@@ -69,13 +67,11 @@ namespace CanvasDrawer.Util {
         //public access to the singleton
         public static SharedTimer Instance {
             get {
-                lock (_padlock) {
-                    if (_instance == null) {
-                        _instance = new SharedTimer();
-                    }
-                    return _instance;
-                }
-            }
+				if (_instance == null) {
+					_instance = new SharedTimer();
+				}
+				return _instance;
+			}
         }
 
     }

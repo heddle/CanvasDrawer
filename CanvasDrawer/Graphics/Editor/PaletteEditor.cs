@@ -10,9 +10,7 @@ using CanvasDrawer.Graphics.Popup;
 namespace CanvasDrawer.Graphics.Editor {
     public sealed class PaletteEditor : BaseEditor {
 
-        //use thread safe singleton pattern
         private static PaletteEditor _instance;
-        private static readonly object _padlock = new object();
 
         public PaletteEditor() : base() {
         }
@@ -22,13 +20,11 @@ namespace CanvasDrawer.Graphics.Editor {
         /// </summary>
         public static PaletteEditor Instance {
             get {
-                lock (_padlock) {
-                    if (_instance == null) {
-                        _instance = new PaletteEditor();
-                    }
-                    return _instance;
-                }
-            }
+				if (_instance == null) {
+					_instance = new PaletteEditor();
+				}
+				return _instance;
+			}
         }
 
 

@@ -10,9 +10,7 @@ using CanvasDrawer.Graphics.Popup;
 namespace CanvasDrawer.Graphics.Editor {
     public sealed class TextColorEditor : BaseEditor {
 
-        //use thread safe singleton pattern
-        private static TextColorEditor _instance;
-        private static readonly object _padlock = new object();
+        private static TextColorEditor? _instance;
 
         public TextColorEditor() : base() {
         }
@@ -22,13 +20,11 @@ namespace CanvasDrawer.Graphics.Editor {
         /// </summary>
         public static TextColorEditor Instance {
             get {
-                lock (_padlock) {
-                    if (_instance == null) {
-                        _instance = new TextColorEditor();
-                    }
-                    return _instance;
-                }
-            }
+				if (_instance == null) {
+					_instance = new TextColorEditor();
+				}
+				return _instance;
+			}
         }
 
 

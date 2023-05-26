@@ -14,8 +14,8 @@ namespace CanvasDrawer.Graphics.Toolbar {
     public sealed class ToolbarManager {
 
         //use thread safe singleton pattern
-        private static ToolbarManager _instance;
-        private static readonly object _padlock = new object();
+        private static ToolbarManager? _instance;
+   
 
         //used to update the status
         public delegate void Refresh();
@@ -36,13 +36,11 @@ namespace CanvasDrawer.Graphics.Toolbar {
 
         public static ToolbarManager Instance {
             get {
-                lock (_padlock) {
-                    if (_instance == null) {
-                        _instance = new ToolbarManager();
-                    }
-                    return _instance;
-                }
-            }
+				if (_instance == null) {
+					_instance = new ToolbarManager();
+				}
+				return _instance;
+			}
         }
 
         //Set a buton enebaled or disabled
@@ -253,9 +251,6 @@ namespace CanvasDrawer.Graphics.Toolbar {
             //right click on subnet button or connector button?
             if (name.Equals("subnet")) {
                 SubnetShapeMenu.Instance.MenuTrigger(me.ClientX, me.ClientY);
-            }
-            else if (name.Equals("connector")) {
-                ConnectorMenu.Instance.MenuTrigger(me.ClientX, me.ClientY);
             }
 
         }

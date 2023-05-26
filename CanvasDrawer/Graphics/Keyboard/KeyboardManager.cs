@@ -12,22 +12,18 @@ using CanvasDrawer.Util;
 namespace CanvasDrawer.Graphics.Keyboard {
     public class KeyboardManager {
 
-        //use thread safe singleton pattern
-        private static KeyboardManager _instance;
-        private static readonly object _padlock = new object();
+        private static KeyboardManager? _instance;
 
         KeyboardManager() : base() {
         }
 
         public static KeyboardManager Instance {
             get {
-                lock (_padlock) {
-                    if (_instance == null) {
-                        _instance = new KeyboardManager();
-                    }
-                    return _instance;
-                }
-            }
+				if (_instance == null) {
+					_instance = new KeyboardManager();
+				}
+				return _instance;
+			}
         }
 
 

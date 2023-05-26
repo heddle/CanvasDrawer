@@ -10,12 +10,11 @@ namespace CanvasDrawer.Graphics.Dragging {
 
         //use thread safe singleton pattern
         private static DragManager? _instance;
-        private static readonly object _padlock = new object();
 
-        private UserEvent _currentEvent;
-        private List<Item> _selectedItems;
+        private UserEvent? _currentEvent;
+        private List<Item>? _selectedItems;
 
-        private Rect _confineRect;
+        private Rect? _confineRect;
         private double _cw, _ch;
 
         DragManager() : base() {
@@ -24,13 +23,11 @@ namespace CanvasDrawer.Graphics.Dragging {
         //public accessor for the singleton
         public static DragManager Instance {
             get {
-                lock (_padlock) {
-                    if (_instance == null) {
-                        _instance = new DragManager();
-                    }
-                    return _instance;
-                }
-            }
+				if (_instance == null) {
+					_instance = new DragManager();
+				}
+				return _instance;
+			}
         }
 
         public void InitDragging(UserEvent ue) {
@@ -48,6 +45,10 @@ namespace CanvasDrawer.Graphics.Dragging {
 
         //A mouse move while dragging
         public void UpdateDragging(UserEvent ue) {
+
+            if ((_currentEvent == null) || (_confineRect == null)) {
+                return;
+            }
             double dx = ue.X - _currentEvent.X;
             double dy = ue.Y - _currentEvent.Y;
 
@@ -83,9 +84,11 @@ namespace CanvasDrawer.Graphics.Dragging {
 
                 _confineRect.Move(dx, dy);
 
-                foreach (Item item in _selectedItems) {
-                    if (!item.IsLocked()) {
-                        item.DragMove(dx, dy);
+                if (_selectedItems != null) {
+                    foreach (Item item in _selectedItems) {
+                        if (!item.IsLocked()) {
+                            item.DragMove(dx, dy);
+                        }
                     }
                 }
             }

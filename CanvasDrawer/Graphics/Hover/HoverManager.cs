@@ -14,7 +14,7 @@ namespace CanvasDrawer.Graphics.Hover {
     public class HoverManager : IItemObserver {
 
         //the item who is being hovered (or potentially hovered)
-        private Item _hotItem;
+        private Item? _hotItem;
 
         //the trigger time
         private long _triggerTime;
@@ -26,7 +26,7 @@ namespace CanvasDrawer.Graphics.Hover {
         private long _duration = 500;
 
         //the text bounds
-        private Rect _bounds = new Rect();
+        private Rect? _bounds = new Rect();
 
         //horizontal location of hover
         public double HoverX { get; set; } = Double.NaN;
@@ -38,8 +38,7 @@ namespace CanvasDrawer.Graphics.Hover {
         public bool HoverVisible { get; set; } = false;
 
         //use thread safe singleton pattern
-        private static HoverManager _instance;
-        private static readonly object _padlock = new object();
+        private static HoverManager? _instance;
 
         //margins
         private int _marginH = 2;
@@ -53,13 +52,11 @@ namespace CanvasDrawer.Graphics.Hover {
         //public access to the singleton
         public static HoverManager Instance {
             get {
-                lock (_padlock) {
-                    if (_instance == null) {
-                        _instance = new HoverManager();
-                    }
-                    return _instance;
-                }
-            }
+				if (_instance == null) {
+					_instance = new HoverManager();
+				}
+				return _instance;
+			}
         }
 
         /// <summary>

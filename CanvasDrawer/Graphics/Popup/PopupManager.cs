@@ -44,9 +44,7 @@ namespace CanvasDrawer.Graphics.Popup {
         public delegate void Refresh();
         public Refresh Refresher { get; set; }
 
-        //use thread safe singleton pattern
         private static PopupManager _instance;
-        private static readonly object _padlock = new object();
 
         /// <summary>
         /// Create the PopupManager singleton.
@@ -90,13 +88,11 @@ namespace CanvasDrawer.Graphics.Popup {
 		/// </summary>
 		public static PopupManager Instance {
             get {
-                lock (_padlock) {
-                    if (_instance == null) {
-                        _instance = new PopupManager();
-                    }
-                    return _instance;
-                }
-            }
+				if (_instance == null) {
+					_instance = new PopupManager();
+				}
+				return _instance;
+			}
         }
 
         //popup menu item selected. We are passed the label.
@@ -196,9 +192,6 @@ namespace CanvasDrawer.Graphics.Popup {
 
                     if ((item != null) && item.IsLineConnector()) {
                         LineConnectorItem cnx = (LineConnectorItem)item;
-                        if (cnx.GetConnectorType() != ConnectorMenu.LINECNX) {
-                            item = null;
-                        }
                     }
 
 

@@ -16,7 +16,6 @@
 @using TextColor
 @using Feedback
 @using Palette
-@using ConnectorChooser
 @using Popup
 @using DrawingCanvas
 
@@ -212,11 +211,6 @@
                 <ShapeChooser />
             </m3popup>
         </section>
-        <section class="box stack-top-4">
-            <m3popup>
-                <ConnectorChooser />
-            </m3popup>
-        </section>
     </mframe>
 
 
@@ -233,7 +227,6 @@
             if (e.Button == 0)
             {
                 SubnetShapeMenu.Instance.GlobalMouseDown(e);
-                ConnectorMenu.Instance.GlobalMouseDown(e);
             }
         }
 
@@ -290,27 +283,18 @@
         [JSInvokable]
         public static void UpdateTheme(string theme)
         {
-
             if (theme == null)
             {
                 return;
             }
 
             ThemeManager.SetTheme(theme);
-
-            //if (theme.Contains("ight")) {
-            //    SharedTimer.CreateChangeTheme("light", 3);
-            //}
-            //else if (theme.Contains("ark")) {
-            //    SharedTimer.CreateChangeTheme("dark", 3);
-            //}
-            //ThemeManager.UpdateTheme(theme);
         }
 
         [JSInvokable]
-        public static void SetMapFrameSize(int width, int height)
+        public static void SetCancasFrameSize(int width, int height)
         {
-            DisplayManager.Instance.SetMapFrameSize(width, height);
+            DisplayManager.Instance.SetCanvasFrameSize(width, height);
         }
 
         [JSInvokable]

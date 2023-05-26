@@ -61,7 +61,6 @@ namespace CanvasDrawer.Pages {
             _ = DirtyManager.Instance;
             _ = PopupManager.Instance;
             _ = SubnetShapeMenu.Instance;
-            _ = ConnectorMenu.Instance;
             _ = HoverManager.Instance;
         }
 

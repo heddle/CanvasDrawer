@@ -7,9 +7,7 @@ using CanvasDrawer.Graphics.Items;
 namespace CanvasDrawer.Graphics.Editor {
     public sealed class PropertyEditor : BaseEditor {
 
-        //use thread safe singleton pattern
-        private static PropertyEditor _instance;
-        private static readonly object _padlock = new object();
+        private static PropertyEditor? _instance;
 
         public PropertyEditor() : base() {
         }
@@ -17,13 +15,11 @@ namespace CanvasDrawer.Graphics.Editor {
         //public accessor for the singleton
         public static PropertyEditor Instance {
             get {
-                lock (_padlock) {
-                    if (_instance == null) {
-                        _instance = new PropertyEditor();
-                    }
-                    return _instance;
-                }
-            }
+				if (_instance == null) {
+					_instance = new PropertyEditor();
+				}
+				return _instance;
+			}
         }
 
         public void HandleSingleClick(Item item) {

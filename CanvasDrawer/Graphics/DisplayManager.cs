@@ -23,7 +23,6 @@ namespace CanvasDrawer.Graphics {
         /// Do we display the background grid?
         /// </summary>
         public bool ShowGrid { get; set; } = true;
-
         /// <summary>
         /// public access to the singleton
         /// </summary>
@@ -54,8 +53,8 @@ namespace CanvasDrawer.Graphics {
 
 
 
-        //external hook to set map frame size
-        public void SetMapFrameSize(int width, int height) {
+        //external hook to set canvas frame size
+        public void SetCanvasFrameSize(int width, int height) {
             GraphicsManager gm = GraphicsManager.Instance;
             if (gm != null) {
                 PageManager pm = gm.PageManager;

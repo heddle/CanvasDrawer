@@ -74,8 +74,8 @@ namespace CanvasDrawer.Graphics.Theme {
         //than they sound, for example "white" on the light theme is actually
         //black. But this will allow the property to be "white" and the color
         //to be appropriate for the theme.
-        private static Dictionary<string, string> LightThemeMap = new Dictionary<string, string>();
-        private static Dictionary<string, string> DarkThemeMap = new Dictionary<string, string>();
+        private static Dictionary<string, string> LightThemeCanvas = new Dictionary<string, string>();
+        private static Dictionary<string, string> DarkThemeCanvas = new Dictionary<string, string>();
 
         //another dictionary that maps index to name
         private static Dictionary<int, string> TextColorKeyMap = new Dictionary<int, string>();
@@ -130,23 +130,23 @@ namespace CanvasDrawer.Graphics.Theme {
 
 
             //set the text theme maps
-            LightThemeMap.Add("white",  "#000000");
-            LightThemeMap.Add("gray",   "#a9a9a9");
-            LightThemeMap.Add("green",  "#006400");
-            LightThemeMap.Add("blue",   "#1e90ff");
-            LightThemeMap.Add("red",    "#ff0000");
-            LightThemeMap.Add("purple", "#a020f0");
-            LightThemeMap.Add("brown",  "#a0522d");
-            LightThemeMap.Add("yellow", "#ffa500");
+            LightThemeCanvas.Add("white",  "#000000");
+            LightThemeCanvas.Add("gray",   "#a9a9a9");
+            LightThemeCanvas.Add("green",  "#006400");
+            LightThemeCanvas.Add("blue",   "#1e90ff");
+            LightThemeCanvas.Add("red",    "#ff0000");
+            LightThemeCanvas.Add("purple", "#a020f0");
+            LightThemeCanvas.Add("brown",  "#a0522d");
+            LightThemeCanvas.Add("yellow", "#ffa500");
 
-            DarkThemeMap.Add("white",  "#ffffff");
-            DarkThemeMap.Add("gray",   "#d3d3d3");
-            DarkThemeMap.Add("green",  "#90ee90");
-            DarkThemeMap.Add("blue",   "#87cefa");
-            DarkThemeMap.Add("red",    "#ff4500");
-            DarkThemeMap.Add("purple", "#ffb6c1");
-            DarkThemeMap.Add("brown",  "#cd853f");
-            DarkThemeMap.Add("yellow", "#ffff00");
+            DarkThemeCanvas.Add("white",  "#ffffff");
+            DarkThemeCanvas.Add("gray",   "#d3d3d3");
+            DarkThemeCanvas.Add("green",  "#90ee90");
+            DarkThemeCanvas.Add("blue",   "#87cefa");
+            DarkThemeCanvas.Add("red",    "#ff4500");
+            DarkThemeCanvas.Add("purple", "#ffb6c1");
+            DarkThemeCanvas.Add("brown",  "#cd853f");
+            DarkThemeCanvas.Add("yellow", "#ffff00");
 
             //default to dark theme
             SetThemeLight(IsLight, false);
@@ -162,24 +162,19 @@ namespace CanvasDrawer.Graphics.Theme {
             Property prop = textItem.Properties.GetProperty(DefaultKeys.FG_COLOR);
             String propColor = (prop != null) ? prop.Value : "white";
 
-            //for backwards compatibility
-            if (propColor.Contains("#")) {
-                propColor = "white";
-            }
-
             string color;
 
             if (IsLight) {
-                if (!LightThemeMap.ContainsKey(propColor)) {
+                if (!LightThemeCanvas.ContainsKey(propColor)) {
                     propColor = "white";
                 }
-                LightThemeMap.TryGetValue(propColor, out color);
+                LightThemeCanvas.TryGetValue(propColor, out color);
             }
             else { 
-                if (!DarkThemeMap.ContainsKey(propColor)) {
+                if (!DarkThemeCanvas.ContainsKey(propColor)) {
                     propColor = "white";
                 }
-                DarkThemeMap.TryGetValue(propColor, out color);
+                DarkThemeCanvas.TryGetValue(propColor, out color);
             }
 
             return color;
@@ -212,10 +207,10 @@ namespace CanvasDrawer.Graphics.Theme {
    
             string color;
             if (IsLight) {
-                LightThemeMap.TryGetValue(GetGenericColor(index), out color);
+                LightThemeCanvas.TryGetValue(GetGenericColor(index), out color);
             }
             else {
-                DarkThemeMap.TryGetValue(GetGenericColor(index), out color);
+                DarkThemeCanvas.TryGetValue(GetGenericColor(index), out color);
             }
             return color;
         }
@@ -230,10 +225,10 @@ namespace CanvasDrawer.Graphics.Theme {
 
             string color;
             if (IsLight) {
-                DarkThemeMap.TryGetValue(GetGenericColor(index), out color);
+                DarkThemeCanvas.TryGetValue(GetGenericColor(index), out color);
             }
             else {
-                LightThemeMap.TryGetValue(GetGenericColor(index), out color);
+                LightThemeCanvas.TryGetValue(GetGenericColor(index), out color);
             }
             return color;
         }

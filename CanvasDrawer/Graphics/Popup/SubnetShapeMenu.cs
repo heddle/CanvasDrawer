@@ -18,9 +18,7 @@ namespace CanvasDrawer.Graphics.Popup {
         public static readonly int ELLIPSE   = 1;
         public static readonly int CLOUD     = 2;
 
-        //use thread safe singleton pattern
-        private static SubnetShapeMenu _instance;
-        private static readonly object _padlock = new object();
+        private static SubnetShapeMenu? _instance;
 
         public SubnetShapeMenu() : base(ShapeImageFiles, "subnet") {
             CurrentSelection = RECTANGLE;
@@ -31,13 +29,11 @@ namespace CanvasDrawer.Graphics.Popup {
         /// </summary>
         public static SubnetShapeMenu Instance {
             get {
-                lock (_padlock) {
-                    if (_instance == null) {
-                        _instance = new SubnetShapeMenu();
-                    }
-                    return _instance;
-                }
-            }
+				if (_instance == null) {
+					_instance = new SubnetShapeMenu();
+				}
+				return _instance;
+			}
         }
 
     }

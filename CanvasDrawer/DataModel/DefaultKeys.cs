@@ -34,9 +34,6 @@ namespace CanvasDrawer.DataModel
 
 		public static readonly string SHAPE = "Shape";
 
-		//for connector types
-		public static readonly string CNXTYPE = "CnxType";
-
         //global properties, not per item
         public static readonly string GLOBAL_PREFIX = "GLOBAL_";
         public static readonly string MAPNAME = GLOBAL_PREFIX + "PicName";

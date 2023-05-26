@@ -18,8 +18,7 @@ namespace CanvasDrawer.Graphics {
     public class DirtyManager : IItemObserver {
 
         //use thread safe singleton pattern
-        private static DirtyManager _instance;
-        private static readonly object _padlock = new object();
+        private static DirtyManager? _instance;
 
         //is the map dirty (needs to be saved)
         public bool IsDirty { get; private set; } = false;
@@ -35,13 +34,11 @@ namespace CanvasDrawer.Graphics {
         /// </summary>
         public static DirtyManager Instance {
             get {
-                lock (_padlock) {
-                    if (_instance == null) {
-                        _instance = new DirtyManager();
-                    }
-                    return _instance;
-                }
-            }
+				if (_instance == null) {
+					_instance = new DirtyManager();
+				}
+				return _instance;
+			}
         }
 
         //only called as a result of a save, unless we implement a

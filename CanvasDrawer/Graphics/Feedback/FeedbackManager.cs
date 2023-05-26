@@ -11,9 +11,7 @@ using CanvasDrawer.State;
 namespace CanvasDrawer.Graphics.Feedback {
     public class FeedbackManager {
 
-        //use thread safe singleton pattern
         private static FeedbackManager? _instance;
-        private static readonly object _padlock = new object();
 
         //used to update the status of the corresponding razor component
         public delegate void Refresh();
@@ -32,13 +30,11 @@ namespace CanvasDrawer.Graphics.Feedback {
 
         public static FeedbackManager Instance {
             get {
-                lock (_padlock) {
-                    if (_instance == null) {
-                        _instance = new FeedbackManager();
-                    }
-                    return _instance;
-                }
-            }
+				if (_instance == null) {
+					_instance = new FeedbackManager();
+				}
+				return _instance;
+			}
         }
 
         //update the feedback debugging display

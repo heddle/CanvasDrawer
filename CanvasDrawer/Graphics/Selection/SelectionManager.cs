@@ -14,8 +14,7 @@ namespace CanvasDrawer.Graphics.Selection {
         public delegate bool SelectFilter(EItemType type);
 
         //use thread safe singleton pattern
-        private static SelectionManager _instance;
-        private static readonly object _padlock = new object();
+        private static SelectionManager? _instance;
 
         //interested in item selection changes
         private List<ISelectionObserver> _observers;
@@ -28,13 +27,11 @@ namespace CanvasDrawer.Graphics.Selection {
         //accessor to the singleton
         public static SelectionManager Instance {
             get {
-                lock (_padlock) {
-                    if (_instance == null) {
-                        _instance = new SelectionManager();
-                    }
-                    return _instance;
-                }
-            }
+				if (_instance == null) {
+					_instance = new SelectionManager();
+				}
+				return _instance;
+			}
         }
 
         /// <summary>

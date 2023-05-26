@@ -16,20 +16,20 @@ namespace CanvasDrawer.Graphics.Connection
 
 		private static readonly string MAKECONNECTIONCOLOR = "#CC1111";
 
-		public Item StartItem { get; set; }
-		public Item EndItem { get; set; }
+		public Item? StartItem { get; set; }
+		public Item? EndItem { get; set; }
 
-		public DoublePoint _prevPoint;
+		public DoublePoint? _prevPoint;
 
-		private EConnectionType _connectionType;
+		private EConnectionType? _connectionType;
 
 		//the item you broke from when reconnecting.
-		public Item BrokenLinkItem { get; set; }
+		public Item? BrokenLinkItem { get; set; }
 
-		private static ConnectionManager _instance;
+		private static ConnectionManager? _instance;
 
 		//have to cache the line color for reconnects
-		private string _reconnectLineColor;
+		private string? _reconnectLineColor;
 
 		ConnectionManager() : base()
 		{
@@ -130,36 +130,20 @@ namespace CanvasDrawer.Graphics.Connection
 				_prevPoint = new DoublePoint();
 			} else {
 				//restore the old
-				DoublePoint foc = StartItem.GetFocus();
-				Rect r = new Rect(foc, _prevPoint);
 
-				JSInteropManager? jsm = JSInteropManager.Instance;
-				if (jsm == null) {
-					return;
-				}
-				jsm.RestoreCanvasFromBackgroundImage();
+				if (StartItem != null) {
+					DoublePoint foc = StartItem.GetFocus();
+					Rect r = new Rect(foc, _prevPoint);
 
-				//draw the new
-
-				if (ConnectorMenu.Instance.CurrentSelection == ConnectorMenu.LINECNX) {
-					jsm.DrawLine(foc.X, foc.Y, ue.X, ue.Y, MAKECONNECTIONCOLOR, 2, 5);
-				}
-				if (ConnectorMenu.Instance.CurrentSelection == ConnectorMenu.WANCNX) {
-					// lightening bolt
-					double delX = ue.X - foc.X;
-					double delY = ue.Y - foc.Y;
-					double len = Math.Sqrt(delX * delX + delY * delY);
-					len = Math.Max(60, len - 48);
-					double angle = Math.Atan2(delY, delX);
-					double xc = (ue.X + foc.X) / 2;
-					double yc = (ue.Y + foc.Y) / 2;
-					double width = len;
-					double height = Math.Min(20, 10 * (len / 60));
-					if (len < 280) {
-						jsm.DrawRotatedImage(xc, yc, width, height, angle, "boltSmall");
-					} else {
-						jsm.DrawRotatedImage(xc, yc, width, height, angle, "boltLarge");
+					JSInteropManager? jsm = JSInteropManager.Instance;
+					if (jsm == null) {
+						return;
 					}
+					jsm.RestoreCanvasFromBackgroundImage();
+
+					//draw the new
+
+					jsm.DrawLine(foc.X, foc.Y, ue.X, ue.Y, MAKECONNECTIONCOLOR, 2, 5);
 				}
 
 			}
@@ -216,20 +200,28 @@ namespace CanvasDrawer.Graphics.Connection
 		/// <param name="item1">One item of the potential connection.</param>
 		/// <param name="item2">Other item of the potential connection.</param>
 		/// <returns>The connector item, or null if the items are not connected,</returns>
-		public ConnectorItem GetConnector(Item item1, Item item2)
+		public ConnectorItem? GetConnector(Item item1, Item item2)
 		{
 
 			foreach (Item item in GetAllConnections()) {
-				Item startItem = ((ConnectorItem)item).StartItem;
-				Item endItem = ((ConnectorItem)item).EndItem;
 
-				if ((item1 == startItem) && (item2 == endItem)) {
-					return (ConnectorItem)item;
-				}
-				if ((item2 == startItem) && (item1 == endItem)) {
-					return (ConnectorItem)item;
-				}
+				if (item != null) {
 
+					ConnectorItem citem = (ConnectorItem)item;
+
+					if ((citem.StartItem == null) || (citem.EndItem == null)) {
+						continue;
+					}
+					Item startItem = citem.StartItem;
+					Item endItem = citem.EndItem;
+
+					if ((item1 == startItem) && (item2 == endItem)) {
+						return citem;
+					}
+					if ((item2 == startItem) && (item1 == endItem)) {
+						return citem;
+					}
+				}
 			}
 
 			return null;
@@ -241,7 +233,7 @@ namespace CanvasDrawer.Graphics.Connection
 		/// <param name="item1">One item of the potential connection.</param>
 		/// <param name="item2">Other item of the potential connection.</param>
 		/// <returns>true if the items are connected.</returns>
-		public bool AreConnected(Item item1, Item item2)
+		public bool AreConnected(Item? item1, Item? item2)
 		{
 
 			if ((item1 == null) || (item2 == null)) {
