@@ -1,11 +1,6 @@
-﻿<style>
-    .collapseNavbar {
-        display: none;
-    }
-</style>
-<div class="top-row ps-3 navbar navbar-dark">
+﻿<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">CanvasDrawer</a>
+        <a class="navbar-brand" href="">Canvas Drawing</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -14,21 +9,21 @@
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
-        <li class="nav-item px-3">
+        <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="oi oi-home" aria-hidden="true"></span> Home
             </NavLink>
-        </li>
-        <li class="nav-item px-3">
+        </div>
+        <div class="nav-item px-3">
             <NavLink class="nav-link" href="jsonpage">
-                <span class="oi oi-plus" aria-hidden="true"></span> JSon Model
+                <span class="oi oi-plus" aria-hidden="true"></span> JSON
             </NavLink>
-        </li>
-        <li class="nav-item px-3">
+        </div>
+        <div class="nav-item px-3">
             <NavLink class="nav-link" href="canvasdrawerpage">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Canvas Drawer
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Canvas
             </NavLink>
-        </li>
+        </div>
     </nav>
 </div>
 
@@ -42,4 +37,3 @@
         collapseNavMenu = !collapseNavMenu;
     }
 }
-
